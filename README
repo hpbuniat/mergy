@@ -23,3 +23,5 @@ mergy.sh [--remote=[repository|branch]]     // remote repository, might be only 
          [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
          [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
          [--reintegrate]                    // reintegrate a whole branch - without specific revisions
+         [--list]                           // list unmerged revisions from repository
+         [--verbose]                        // verbose
