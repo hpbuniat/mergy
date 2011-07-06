@@ -1,0 +1,20 @@
+{
+    "path": ".",
+    "remote": "your-repo",
+    "pre": {
+        "revert": {
+        },
+    },
+    "post": {
+        "phpunit": {
+            "command": "cd tests; phpunit",
+            "failonerror": true
+        },
+        "commit": {
+        },
+        "stage": {
+        }
+    },
+    "force": "!merge",
+    "merge": ["ticket", "comment", "revision"]
+}
