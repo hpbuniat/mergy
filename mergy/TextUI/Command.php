@@ -142,7 +142,7 @@ class mergy_TextUI_Command {
      *
      * @param boolean $exit
      */
-    public static function main($exit = TRUE) {
+    public static function main($exit = true) {
         $command = new mergy_TextUI_Command();
         $command->run($_SERVER['argv'], $exit);
     }
@@ -155,7 +155,7 @@ class mergy_TextUI_Command {
      *
      * @return mergy_TextUI_Command
      */
-    public function run(array $argv, $exit = TRUE) {
+    public function run(array $argv, $exit = true) {
         $this->handleArguments($argv);
 
         $oAggregator = new mergy_Revision_Aggregator();

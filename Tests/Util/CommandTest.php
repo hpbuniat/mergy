@@ -57,7 +57,7 @@ class mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
     public function testCommandConstruct() {
         $o = new mergy_Util_Command('dir');
         $this->assertInstanceOf('mergy_Util_Command', $o->execute());
-        $this->assertTrue($o->isSuccess());
+        $this->asserttrue($o->isSuccess());
         $this->assertContains('mergy.php', $o->get());
         $this->assertEquals(0, $o->status());
     }
@@ -69,7 +69,7 @@ class mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
         $o = new mergy_Util_Command();
         $this->assertInstanceOf('mergy_Util_Command', $o->command('dir'));
         $this->assertInstanceOf('mergy_Util_Command', $o->execute());
-        $this->assertTrue($o->isSuccess());
+        $this->asserttrue($o->isSuccess());
         $this->assertContains('mergy.php', $o->get());
         $this->assertEquals(0, $o->status());
     }
@@ -80,7 +80,7 @@ class mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
     public function testCommandFailure() {
         $o = new mergy_Util_Command();
         $this->assertInstanceOf('mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertFalse($o->isSuccess());
+        $this->assertfalse($o->isSuccess());
         $this->assertEquals(127, $o->status());
     }
 }

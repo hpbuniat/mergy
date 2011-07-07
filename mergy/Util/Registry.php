@@ -122,8 +122,8 @@ class mergy_Util_Registry extends ArrayObject {
     }
 
     /**
-     * Returns TRUE if the $index is a named value in the registry,
-     * or FALSE if $index was not found in the registry.
+     * Returns true if the $index is a named value in the registry,
+     * or false if $index was not found in the registry.
      *
      * @param  string $index
      *
