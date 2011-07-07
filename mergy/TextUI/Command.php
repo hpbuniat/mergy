@@ -102,25 +102,25 @@ class mergy_TextUI_Command {
      *
      * @var array
      */
-    protected $options = array();
+    protected $_aOptions = array();
 
     /**
      * Long-Options
      *
      * @var array
      */
-    protected $longOptions = array(
-        'remote=' => NULL,
-        'ticket=' => NULL,
-        'force=' => NULL,
-        'rev=' => NULL,
-        'path=' => NULL,
-        'continue' => NULL,
-        'reintegrate' => NULL,
-        'help' => NULL,
-        'verbose' => NULL,
-        'list' => NULL,
-        'version' => NULL
+    protected $_aLongOptions = array(
+        'remote=' => null,
+        'ticket=' => null,
+        'force=' => null,
+        'rev=' => null,
+        'path=' => null,
+        'continue' => null,
+        'reintegrate' => null,
+        'help' => null,
+        'verbose' => null,
+        'list' => null,
+        'version' => null
     );
 
     /**
@@ -185,17 +185,17 @@ class mergy_TextUI_Command {
 
         $oConsole = new Console_Getopt();
         try {
-            $this->options = $oConsole->getopt($argv, '', array_keys($this->longOptions));
+            $this->_aOptions = $oConsole->getopt($argv, '', array_keys($this->_aLongOptions));
         }
         catch (RuntimeException $e) {
             mergy_TextUI_Output::info($e->getMessage());
         }
 
-        if ($this->options instanceof PEAR_Error) {
-            mergy_TextUI_Output::error($this->options->getMessage());
+        if ($this->_aOptions instanceof PEAR_Error) {
+            mergy_TextUI_Output::error($this->_aOptions->getMessage());
         }
 
-        foreach ($this->options[0] as $option) {
+        foreach ($this->_aOptions[0] as $option) {
             switch ($option[0]) {
                 case '--rev':
                     $this->_aArguments['cliRevisions'] = $option[1];

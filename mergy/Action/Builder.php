@@ -77,7 +77,7 @@ class mergy_Action_Builder {
      * @return mergy_Action_Builder
      */
     public function build($sType, stdclass $oConfig, $sStep = null) {
-        $sType = ucfirst(strtolower(isset($oConfig->type) ? $oConfig->type : $sType));
+        $sType = ucfirst(strtolower(isset($oConfig->type) === true ? $oConfig->type : $sType));
         $sClass = str_replace('Builder', 'Concrete', get_class($this)) . '_' . $sType;
         if (class_exists($sClass)) {
             $oAction = new $sClass(mergy_Util_Registry::get('_CONFIG'), $oConfig);
