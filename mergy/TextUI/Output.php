@@ -60,7 +60,7 @@ class mergy_TextUI_Output {
      * @return void
      */
     static public function error($message, $exit = true) {
-        print 'Error: ' . $message . PHP_EOL;
+        print_r('Error: ' . $message . PHP_EOL);
         if ($exit === true) {
             exit(mergy_TextUI_Command::ERROR_EXIT);
         }
@@ -74,7 +74,7 @@ class mergy_TextUI_Output {
      * @return void
      */
     static public function info($message) {
-        print $message . PHP_EOL;
+        print_r($message . PHP_EOL);
     }
 
     /**
@@ -85,6 +85,6 @@ class mergy_TextUI_Output {
      * @return void
      */
     static public function write($message) {
-        print $message;
+        print_r($message);
     }
 }

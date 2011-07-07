@@ -66,7 +66,7 @@ class mergy_Action_Concrete_Phpunit extends mergy_Action_AbstractAction {
         $this->_oCommand->execute('cd ' . $this->_oConfig->path . ';' . $this->_oProperties->command);
 
         $bOutput = false;
-        if (isset($this->_oProperties->failonerror) === true and $this->_oProperties->failonerror == true) {
+        if (isset($this->_oProperties->failonerror) === true and $this->_oProperties->failonerror === true) {
             if ($this->_oCommand->isSuccess() !== true) {
                 $this->_bContinue = false;
                 $bOutput = true;

@@ -103,7 +103,7 @@ class mergy_Action_Handler {
      * @return mergy_Action_Handler
      */
     public function add(mergy_Action_AbstractAction $oProcess, $sStack = null) {
-        if (is_null($sStack) or $sStack == '') {
+        if (empty($sStack) === true) {
             $sStack = self::SINGLE;
         }
 
@@ -165,7 +165,7 @@ class mergy_Action_Handler {
         $oConfig = mergy_Util_Registry::get('_CONFIG');
         foreach ($aRevisions as $oRevision) {
             $oMerge = new mergy_Action_Concrete_Merge($oConfig, new stdClass());
-            if ($oConfig->reintegrate == true) {
+            if ($oConfig->reintegrate === true) {
                 $oMerge->reintegrate();
             }
             else {

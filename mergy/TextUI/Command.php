@@ -250,7 +250,7 @@ class mergy_TextUI_Command {
         }
 
         $sConfig = self::CONFIG_FILE;
-        if (isset($this->_aArguments['config'])) {
+        if (isset($this->_aArguments['config']) === true) {
             $sConfig = $this->_aArguments['config'];
         }
 
@@ -261,7 +261,7 @@ class mergy_TextUI_Command {
         }
 
         if (empty($this->_aArguments['remote']) !== true and preg_match('!http(s)?://!i', $this->_aArguments['remote']) === 0) {
-            if (isset($this->_aArguments['config']->remote)) {
+            if (isset($this->_aArguments['config']->remote) === true) {
                 $aRemote = explode('/', $this->_aArguments['config']->remote);
                 $aRemote[count($aRemote) - 1] = $this->_aArguments['remote'];
                 $this->_aArguments['remote'] = implode('/', $aRemote);
@@ -341,7 +341,7 @@ class mergy_TextUI_Command {
             }
         }
 
-        if ($this->_aArguments['config']->reintegrate == true) {
+        if ($this->_aArguments['config']->reintegrate === true) {
             $this->_aArguments['config']->revisions = $this->_aArguments['revisions'] = array(
                 'HEAD'
             );
@@ -363,7 +363,7 @@ class mergy_TextUI_Command {
      * @return void
      */
     protected function showHelp() {
-        print <<<EOT
+        echo <<<EOT
 Usage: mergy [switches]
 
   --remote=[repository|branch]     // remote repository, might be only a branch-name
