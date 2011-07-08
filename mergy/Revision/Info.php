@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -41,11 +40,32 @@
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', dirname(__FILE__));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+/**
+ * Read the information of a revision
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class mergy_Revision_Info extends mergy_Revision_SvnAbstract {
+
+    /**
+     * (non-PHPdoc)
+     * @see mergy_Util_Cacheable::_get()
+     */
+    protected function _get() {
+        $sCommand = 'svn log ' . $this->_sRepository . ' --xml -v -r ' . $this->_iRevision;
+        $oCommand = new mergy_Util_Command($sCommand);
+        $oCommand->execute();
+
+        $this->_mCache = $oCommand->get();
+        if ($oCommand->isSuccess() !== true) {
+            $this->_mCache = '';
+            mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
+        }
+
+        return $this;
+    }
 }
-
-require 'mergy' . DIRECTORY_SEPARATOR . 'Autoload.php';
-
-mergy_TextUI_Command::main();

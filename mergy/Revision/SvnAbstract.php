@@ -41,7 +41,7 @@
  */
 
 /**
- * Read the information of a revision
+ * Base class for cacheable SVN-Operations
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,7 +49,7 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class mergy_Revision_Cache extends mergy_Util_Cacheable {
+abstract class mergy_Revision_SvnAbstract extends mergy_Util_Cacheable {
 
     /**
      * The repository of the revision
@@ -66,6 +66,20 @@ class mergy_Revision_Cache extends mergy_Util_Cacheable {
     protected $_iRevision;
 
     /**
+     * Concrete file Path
+     *
+     * @var string
+     */
+    protected $_sPath;
+
+    /**
+     * Concrete file action type
+     *
+     * @var string
+     */
+    protected $_sType;
+
+    /**
      * Error string
      *
      * @var string
@@ -77,29 +91,14 @@ class mergy_Revision_Cache extends mergy_Util_Cacheable {
      *
      * @param  string $sRepository
      * @param  int $iRevision
+     * @param  string $sPath
      */
-    public function __construct($sRepository, $iRevision) {
+    public function __construct($sRepository, $iRevision, $sPath = null, $sType = null) {
         $this->_iRevision = $iRevision;
         $this->_sRepository = $sRepository;
+        $this->_sPath = $sPath;
+        $this->_sType = $sType;
         $this->_id();
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see mergy_Util_Cacheable::_get()
-     */
-    protected function _get() {
-        $sCommand = 'svn log ' . $this->_sRepository . ' --xml -v -r ' . $this->_iRevision;
-        $oCommand = new mergy_Util_Command($sCommand);
-        $oCommand->execute();
-
-        $this->_mCache = $oCommand->get();
-        if ($oCommand->isSuccess() !== true) {
-            $this->_mCache = '';
-            mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
-        }
-
-        return $this;
     }
 
     /**
@@ -107,7 +106,7 @@ class mergy_Revision_Cache extends mergy_Util_Cacheable {
      * @see mergy_Util_Cacheable::_id()
      */
     protected function _id() {
-        $this->_sId = md5($this->_iRevision . $this->_sRepository);
+        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . __CLASS__);
         return $this->_file();
     }
 }

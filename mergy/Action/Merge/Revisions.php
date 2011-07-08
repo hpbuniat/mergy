@@ -73,12 +73,12 @@ class mergy_Action_Merge_Revisions {
      *
      * @return mergy_Action_Merge_Revisions
      */
-    public function setup(array $aRevisions, array $aMerge) {
+    public function setup(array $aRevisions, stdClass $oConfig) {
         $this->_aRevisions = $aRevisions;
-        foreach ($aMerge as $sMerge) {
-            $sDecide = str_replace('Revision', 'Decision', get_class($this)) . '_' . ucfirst(strtolower($sMerge));
+        foreach ($oConfig->merge as $sMerge) {
+            $sDecide = str_replace('Revisions', 'Decision', get_class($this)) . '_' . ucfirst(strtolower($sMerge));
             if (class_exists($sDecide) === true) {
-                $this->register(new $sDecide(mergy_Util_Registry::get('_CONFIG')));
+                $this->register(new $sDecide($oConfig));
             }
         }
 

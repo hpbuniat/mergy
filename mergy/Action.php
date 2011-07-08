@@ -119,7 +119,7 @@ class mergy_Action {
     }
 
     /**
-     * Decide which revisions to merge
+     * Set which revisions to merge
      *
      * @param  array $aRevisions
      *
@@ -127,10 +127,6 @@ class mergy_Action {
      */
     public function revisions(array $aRevisions) {
         $this->_aRevisions = $aRevisions;
-        $oRevisions = new mergy_Action_Merge_Revisions();
-        $this->_aRevisions = $oRevisions->setup($this->_aRevisions, $this->_oConfig->merge)->get();
-        unset($oRevisions);
-
         return $this;
     }
 

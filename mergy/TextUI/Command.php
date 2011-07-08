@@ -94,6 +94,8 @@ class mergy_TextUI_Command {
     protected $_aArguments = array(
         'verbose' => false,
         'list' => false,
+        'diff' => false,
+        'all' => false,
         'remote' => ''
     );
 
@@ -120,6 +122,9 @@ class mergy_TextUI_Command {
         'help' => null,
         'verbose' => null,
         'list' => null,
+        'diff' => null,
+        'all' => null,
+        'diff-all' => null,
         'version' => null
     );
 
@@ -154,6 +159,8 @@ class mergy_TextUI_Command {
      * @param  boolean $exit
      *
      * @return mergy_TextUI_Command
+     *
+     * @TODO Cleanup !
      */
     public function run(array $argv, $exit = true) {
         $this->handleArguments($argv);
@@ -162,10 +169,21 @@ class mergy_TextUI_Command {
         $aRevisions = $oAggregator->set($this->_aArguments)->run()->get();
         if ($this->_aArguments['list'] === true) {
             foreach ($aRevisions as $oRevision) {
-                mergy_TextUI_Output::info($oRevision);
+                mergy_TextUI_Output::info($oRevision->__toString());
             }
         }
-        else {
+
+        if ($this->_aArguments['list'] !== true and $this->_aArguments['all'] !== true) {
+            $oRevisions = new mergy_Action_Merge_Revisions();
+            $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
+        }
+
+        if ($this->_aArguments['diff'] === true) {
+            $oDiff = new mergy_Util_Diff_Renderer();
+            $oDiff->revisions($aRevisions)->render();
+        }
+
+        if ($this->_aArguments['list'] !== true and $this->_aArguments['diff'] !== true) {
             $oAction = new mergy_Action($this->_aArguments['config']);
             $oAction->setup()->revisions($aRevisions)->merge()->post();
         }
@@ -179,6 +197,8 @@ class mergy_TextUI_Command {
      * @param array $argv
      *
      * @return mergy_TextUI_Command
+     *
+     * @TODO Cleanup!
      */
     protected function handleArguments(array $argv) {
         self::printVersionString();
@@ -235,6 +255,19 @@ class mergy_TextUI_Command {
 
                 case '--list':
                     $this->_aArguments['list'] = true;
+                    break;
+
+                case '--diff':
+                    $this->_aArguments['diff'] = true;
+                    break;
+
+                case '--all':
+                    $this->_aArguments['all'] = true;
+                    break;
+
+                case '--diff-all':
+                    $this->_aArguments['diff'] = true;
+                    $this->_aArguments['all'] = true;
                     break;
 
                 case '--help':
@@ -309,6 +342,8 @@ class mergy_TextUI_Command {
      * @return mergy_TextUI_Command
      *
      * @throws Exception
+     *
+     * @TODO Move this to a class
      */
     protected function _handleRevisions($sRevisions = '') {
         $this->_aArguments['revisions'] = array();

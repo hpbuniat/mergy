@@ -87,6 +87,20 @@ class mergy_Revision {
     public $sDate;
 
     /**
+     * Modified Files
+     *
+     * @var array
+     */
+    public $aFiles = array();
+
+    /**
+     * Diffs of modified files
+     *
+     * @var array
+     */
+    public $aDiffs = array();
+
+    /**
      * Create a Revision-Object
      *
      * @param  string $sRepository
@@ -103,11 +117,23 @@ class mergy_Revision {
      * @return mergy_Revision
      */
     public function read() {
-        $oInfo = $this->_fetch();
-        if ($oInfo instanceof SimpleXMLElement) {
-            $this->sInfo = (string) $oInfo->logentry->msg;
-            $this->sAuthor = (string) $oInfo->logentry->author;
-            $this->sDate = (string) $oInfo->logentry->date;
+        return $this->_fetchFiles()->_fetchInfo();
+    }
+
+    /**
+     * Get diff-output for modified files
+     *
+     * @return mergy_Revision
+     */
+    public function diff() {
+        $this->aDiffs = array();
+        foreach ($this->aFiles as $aFile) {
+            $oCache = new mergy_Revision_Diff($this->sRepository, $this->iRevision, $aFile['path'], $aFile['type']);
+            $this->aDiffs[] = array(
+                'file' => $aFile['path'],
+                'diff' => $oCache->get(),
+                'type' => $aFile['type'],
+            );
         }
 
         return $this;
@@ -125,10 +151,44 @@ class mergy_Revision {
     /**
      * Read Information about a revision from a repository
      *
-     * @return SimpleXMLElement
+     * @return mergy_Revision
      */
-    public function _fetch() {
-        $oCache = new mergy_Revision_Cache($this->sRepository, $this->iRevision);
-        return simplexml_load_string($oCache->get());
+    protected function _fetchInfo() {
+        $oCache = new mergy_Revision_Info($this->sRepository, $this->iRevision);
+        $oInfo = simplexml_load_string($oCache->get());
+        if ($oInfo instanceof SimpleXMLElement) {
+            $this->sInfo = (string) $oInfo->logentry->msg;
+            $this->sAuthor = (string) $oInfo->logentry->author;
+            $this->sDate = (string) $oInfo->logentry->date;
+        }
+
+        unset($oCache, $oInfo);
+        return $this;
+    }
+
+    /**
+     * Read modifications of a revision from a repository
+     *
+     * @return mergy_Revision
+     */
+    protected function _fetchFiles() {
+        $this->aFiles = array();
+        $oCache = new mergy_Revision_Files($this->sRepository, $this->iRevision);
+        $oFiles = simplexml_load_string($oCache->get());
+        if ($oFiles instanceof SimpleXMLElement) {
+            foreach ($oFiles->paths->children() as $oPath) {
+                $aAttributes = $oPath->attributes();
+                $sPath = (string) $oPath;
+                if (strlen($sPath) > 0 and isset($aAttributes->kind) === true and (string )$aAttributes->kind === 'file') {
+                    $this->aFiles[] = array(
+                        'type' => $aAttributes->item,
+                        'path' => $sPath
+                    );
+                }
+            }
+        }
+
+        unset($oCache, $oFiles);
+        return $this;
     }
 }

@@ -8,6 +8,7 @@ If you're pushing all, ticket-related or not, commits to a single branch, where
 you're picking specific revision of important changes or finished tickets to merge
 them into your stable trunk - mergy can do a lot of repeating tasks for you:
 
+- create diff before merge, for quick review without additional tools like reviewboard
 - selecting un-merged revision from branches
 - filtering important and ticket-related revision
 - auto-commit to trunk
@@ -24,4 +25,7 @@ mergy.sh [--remote=[repository|branch]]     // remote repository, might be only 
          [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
          [--reintegrate]                    // reintegrate a whole branch - without specific revisions
          [--list]                           // list unmerged revisions from repository
+         [--diff]                           // create a diff, based on the revisions to merge
+         [--all]                            // use all unmerged revisions
+         [--diff-all]                       // equals --diff --all
          [--verbose]                        // verbose
