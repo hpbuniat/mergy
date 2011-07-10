@@ -205,7 +205,7 @@ class mergy_TextUI_Command {
 
         $oConsole = new Console_Getopt();
         try {
-            $this->_aOptions = $oConsole->getopt($argv, '', array_keys($this->_aLongOptions));
+            $this->_aOptions = @$oConsole->getopt($argv, '', array_keys($this->_aLongOptions));
         }
         catch (RuntimeException $e) {
             mergy_TextUI_Output::info($e->getMessage());

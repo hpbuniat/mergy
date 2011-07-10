@@ -106,7 +106,7 @@ abstract class mergy_Revision_SvnAbstract extends mergy_Util_Cacheable {
      * @see mergy_Util_Cacheable::_id()
      */
     protected function _id() {
-        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . __CLASS__);
+        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . get_class($this));
         return $this->_file();
     }
 }

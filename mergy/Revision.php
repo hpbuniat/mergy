@@ -145,7 +145,7 @@ class mergy_Revision {
      * @return string
      */
     public function __toString() {
-        return $this->iRevision . "\t" . $this->sAuthor . "\t\t" . $this->sInfo;
+        return str_pad($this->iRevision, 7) . str_pad($this->sAuthor, 18) . str_replace("\n", ' ', $this->sInfo);
     }
 
     /**
