@@ -84,7 +84,7 @@ class mergy_Util_Diff_Renderer {
      *
      * @var string
      */
-    const REVISION_TEXT = 'Showing %d change(s) in revision %d';
+    const REVISION_TEXT = 'Showing %d change(s) in revision %d (by %s @ %s)';
 
     /**
      * Head-text for diffs
@@ -98,7 +98,7 @@ class mergy_Util_Diff_Renderer {
      *
      * @var string
      */
-    const NO_DIFF = 'No diff for %s at revision %d, maybe the file was deleted';
+    const NO_DIFF = 'No diff for %s at revision %d (File was deleted)';
 
     /**
      * Init the Diff-Renderer
@@ -152,9 +152,12 @@ class mergy_Util_Diff_Renderer {
      */
     protected function _addContainer(mergy_Revision $oRevision) {
         $oDiv = $this->_oHtml->createElement('div');
-        $oH2 = $this->_oHtml->createElement('h2', sprintf(self::REVISION_TEXT, $this->_iCount, $oRevision->iRevision));
+        $oDiv->setAttributeNode(new DOMAttr('class', 'revision'));
+        $oH2 = $this->_oHtml->createElement('h3', sprintf(self::REVISION_TEXT, $this->_iCount, $oRevision->iRevision, $oRevision->sAuthor, $oRevision->sDate));
+        $oSpan = $this->_oHtml->createElement('span', htmlspecialchars($oRevision->sInfo));
         $this->_oDiffDiv->appendChild($oDiv);
         $oDiv->appendChild($oH2);
+        $oDiv->appendChild($oSpan);
 
         return $oDiv;
     }
