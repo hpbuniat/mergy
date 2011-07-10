@@ -1,9 +1,15 @@
 {
     "path": ".",
     "remote": "your-repo",
-    "pre": {
+    "init": {
         "revert": {
-        },
+        }
+    },
+    "pre": {
+        "diff": {
+            "confirm": true,
+            "skiponcontinue": true
+        }
     },
     "post": {
         "phpunit": {

@@ -102,9 +102,9 @@ class mergy_Action_Concrete_Merge extends mergy_Action_AbstractAction {
 
     /**
      * (non-PHPdoc)
-     * @see mergy_Action_AbstractAction::execute()
+     * @see mergy_Action_AbstractAction::_execute()
      */
-    public function execute() {
+    protected function _execute() {
         $sCommand = 'svn merge ' . $this->_oConfig->remote . ' --accept postpone --non-interactive ' . $this->_sRevision . ' ' . $this->_oConfig->path . ' | awk \'{a["A"]=32;a["U"]=34;a["C"]=31;a["M"]=34;a["G"]=37;a["?"]=33;a["D"]=36;printf("\033[1;%sm%s\033[0;00m\n",a[$1],$0)}\'';
         $this->_oCommand->execute($sCommand);
 

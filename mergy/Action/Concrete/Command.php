@@ -60,9 +60,9 @@ class mergy_Action_Concrete_Command extends mergy_Action_AbstractAction {
 
     /**
      * (non-PHPdoc)
-     * @see mergy_Action_AbstractAction::execute()
+     * @see mergy_Action_AbstractAction::_execute()
      */
-    public function execute() {
+    protected function _execute() {
         if (empty($this->_oProperties->command) !== true) {
             $this->_oCommand->execute($this->_oProperties->command);
             if ($this->_oCommand->isSuccess() !== true) {

@@ -86,6 +86,7 @@ class mergy_Action_Handler {
      */
     public function reset() {
         $this->_aStacks = array(
+            'init' => array(),
             'pre' => array(),
             'post' => array(),
             self::SINGLE => array()
@@ -144,6 +145,10 @@ class mergy_Action_Handler {
     public function __call($sMethod, $aArgs) {
         if (empty($this->_aStacks[$sMethod]) !== true) {
             foreach ($this->_aStacks[$sMethod] as $oProcess) {
+                if (defined('VERBOSE') === true and VERBOSE === true) {
+                    mergy_TextUI_Output::info('Executing ' . $oProcess->getName() . ' in ' . $sMethod);
+                }
+
                 $this->_aReturn[$oProcess->getName()] = $oProcess->execute()->get();
                 if ($oProcess->isSuccess() !== true) {
                     throw new Exception($oProcess::PROBLEM);

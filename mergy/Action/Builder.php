@@ -59,28 +59,37 @@ class mergy_Action_Builder {
     protected $_oHandler;
 
     /**
+     * Mergy-Config
+     *
+     * @var stdClass
+     */
+    protected $_oConfig;
+
+    /**
      * Create the Action-Builder
      *
      * @param mergy_Action_Handler $oHandler
+     * @param stdClass $oConfig
      */
-    public function __construct(mergy_Action_Handler $oHandler) {
+    public function __construct(mergy_Action_Handler $oHandler, stdClass $oConfig) {
         $this->_oHandler = $oHandler;
+        $this->_oConfig = $oConfig;
     }
 
     /**
      * Build a Action and add it to the handler
      *
      * @param  string $sType
-     * @param  stdclass $oConfig
+     * @param  stdClass $oConfig
      * @param  string $sStep
      *
      * @return mergy_Action_Builder
      */
-    public function build($sType, stdclass $oConfig, $sStep = null) {
+    public function build($sType, stdClass $oConfig, $sStep = null) {
         $sType = ucfirst(strtolower((isset($oConfig->type) === true) ? $oConfig->type : $sType));
         $sClass = str_replace('Builder', 'Concrete', get_class($this)) . '_' . $sType;
         if (class_exists($sClass) === true) {
-            $oAction = new $sClass(mergy_Util_Registry::get('_CONFIG'), $oConfig);
+            $oAction = new $sClass($this->_oConfig, $oConfig);
             $this->_oHandler->add($oAction, strtolower($sStep));
         }
 

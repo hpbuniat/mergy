@@ -178,14 +178,16 @@ class mergy_TextUI_Command {
             $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
         }
 
+        $this->_aArguments['config']->mergeRevisions = $aRevisions;
+
+        $oAction = new mergy_Action($this->_aArguments['config']);
+        $oAction->setup();
         if ($this->_aArguments['diff'] === true) {
-            $oDiff = new mergy_Util_Diff_Renderer();
-            $oDiff->revisions($aRevisions)->render();
+            $oAction->command('Diff');
         }
 
         if ($this->_aArguments['list'] !== true and $this->_aArguments['diff'] !== true) {
-            $oAction = new mergy_Action($this->_aArguments['config']);
-            $oAction->setup()->revisions($aRevisions)->merge()->post();
+            $oAction->pre()->merge()->post();
         }
 
         return $this;
@@ -317,7 +319,7 @@ class mergy_TextUI_Command {
         mergy_Util_Registry::set('_CONFIG', $this->_aArguments['config']);
         $oAction = new mergy_Action($this->_aArguments['config']);
         if ($this->_aArguments['config']->continue !== true and $this->_aArguments['list'] !== true) {
-            $oAction->setup()->pre();
+            $oAction->setup()->init();
         }
 
         try {

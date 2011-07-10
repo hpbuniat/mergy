@@ -80,6 +80,13 @@ abstract class mergy_Action_AbstractAction {
     protected $_bContinue = true;
 
     /**
+     * Default MSG-Text
+     *
+     * @var string
+     */
+    const MSG_CONTINUE = 'Target %s was executed. Press Enter to continue!';
+
+    /**
      * Init an Action
      *
      * @param stdClass $oConfig
@@ -90,6 +97,19 @@ abstract class mergy_Action_AbstractAction {
         $this->_oProperties = $oProperties;
 
         $this->_oCommand = new mergy_Util_Command();
+    }
+
+    /**
+     * Add a value to the properties
+     *
+     * @param  string $sName
+     * @param  mixed $mValue
+     *
+     * @return mergy_Action_AbstractAction
+     */
+    public function property($sName, $mValue) {
+        $this->_oProperties->$sName = $mValue;
+        return $this;
     }
 
     /**
@@ -125,5 +145,43 @@ abstract class mergy_Action_AbstractAction {
      *
      * @return mergy_Action_AbstractAction
      */
-    abstract public function execute();
+    public function execute() {
+        $bExecute = true;
+        if (isset($this->_oProperties->skiponcontinue) === true and $this->_oProperties->skiponcontinue === true and $this->_oConfig->continue === true) {
+            $bExecute = false;
+        }
+
+        return ($bExecute === true) ? $this->_execute()->_confirm() : $this;
+    }
+
+    /**
+     * Confirm the result of an action
+     *
+     * @param  boolean $bEnter
+     * @param  string $sMessage
+     * @param  string $sExpected
+     *
+     * @return mergy_Action_AbstractAction
+     */
+    protected function _confirm($bEnter = true, $sMessage = '', $sExpected = '') {
+        if (isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true) {
+            $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
+            mergy_TextUI_Output::info(sprintf($sMessage, $this->getName()));
+            do {
+                $rInput = fopen('php://stdin', 'r');
+                $sInput = trim(fgets($rInput));
+            }
+            while ($sInput === $sExpected and $bEnter !== true);
+            mergy_TextUI_Output::info('continuing ...');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute an action - concrete
+     *
+     * @return mergy_Action_AbstractAction
+     */
+    abstract protected function _execute();
 }

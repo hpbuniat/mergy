@@ -60,9 +60,9 @@ class mergy_Action_Concrete_Phpunit extends mergy_Action_AbstractAction {
 
     /**
      * (non-PHPdoc)
-     * @see mergy_Action_AbstractAction::execute()
+     * @see mergy_Action_AbstractAction::_execute()
      */
-    public function execute() {
+    protected function _execute() {
         $this->_oCommand->execute('cd ' . $this->_oConfig->path . ';' . $this->_oProperties->command);
 
         $bOutput = false;

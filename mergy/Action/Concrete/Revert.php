@@ -60,9 +60,9 @@ class mergy_Action_Concrete_Revert extends mergy_Action_AbstractAction {
 
     /**
      * (non-PHPdoc)
-     * @see mergy_Action_AbstractAction::execute()
+     * @see mergy_Action_AbstractAction::_execute()
      */
-    public function execute() {
+    protected function _execute() {
         $this->_oCommand->execute('svn revert --non-interactive -R -q ' . $this->_oConfig->path);
         if ($this->_oCommand->isSuccess() !== true) {
             $this->_bContinue = false;

@@ -78,6 +78,7 @@ class mergy_Action {
      * @var array
      */
     protected $_aSteps = array(
+        'init',
         'pre',
         'merge',
         'post'
@@ -98,6 +99,9 @@ class mergy_Action {
     public function __construct(stdclass $oConfig) {
         $this->_oActionHandler = new mergy_Action_Handler();
         $this->_oConfig = $oConfig;
+        if (isset($oConfig->mergeRevisions) === true) {
+            $this->_aRevisions = $oConfig->mergeRevisions;
+        }
     }
 
     /**
@@ -108,7 +112,7 @@ class mergy_Action {
      * @return string
      */
     public function command($sCommand) {
-        $oActionBuilder = new mergy_Action_Builder($this->_oActionHandler);
+        $oActionBuilder = new mergy_Action_Builder($this->_oActionHandler, $this->_oConfig);
         $oActionBuilder->build($sCommand, new stdClass());
 
         $sReturn = $this->_oActionHandler->{mergy_Action_Handler::SINGLE}()->get($sCommand);
@@ -119,24 +123,12 @@ class mergy_Action {
     }
 
     /**
-     * Set which revisions to merge
-     *
-     * @param  array $aRevisions
-     *
-     * @return mergy_Action
-     */
-    public function revisions(array $aRevisions) {
-        $this->_aRevisions = $aRevisions;
-        return $this;
-    }
-
-    /**
      * Setup the action-handler, including the steps
      *
      * @return mergy_Action
      */
     public function setup() {
-        $oActionBuilder = new mergy_Action_Builder($this->_oActionHandler);
+        $oActionBuilder = new mergy_Action_Builder($this->_oActionHandler, $this->_oConfig);
         foreach ($this->_aSteps as $sStep) {
             if (isset($this->_oConfig->$sStep) and $this->_oConfig->$sStep instanceof stdClass) {
                 foreach ($this->_oConfig->$sStep as $sType => $oEntry) {
@@ -158,6 +150,10 @@ class mergy_Action {
      */
     public function __call($sMethod, $aArgs) {
         if (in_array($sMethod, $this->_aSteps) === true and $this->_bProcess === true) {
+            if (defined('VERBOSE') === true and VERBOSE === true) {
+                mergy_TextUI_Output::info('Handling ' . $sMethod . '-Stack');
+            }
+
             try {
                 $this->_oActionHandler->$sMethod($this->_aRevisions);
             }

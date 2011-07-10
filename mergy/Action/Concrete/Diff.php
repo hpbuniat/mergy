@@ -41,7 +41,7 @@
  */
 
 /**
- * Action to get unmerged revisions
+ * Action which creates a diff overview
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,24 +49,23 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class mergy_Action_Concrete_Unmerged extends mergy_Action_AbstractAction {
+class mergy_Action_Concrete_Diff extends mergy_Action_AbstractAction {
 
     /**
      * Failure description
      *
      * @var string
      */
-    const PROBLEM = 'Error while fetching unmerged revisions';
+    const PROBLEM = 'Diff-Creation failed';
 
     /**
      * (non-PHPdoc)
      * @see mergy_Action_AbstractAction::_execute()
      */
     protected function _execute() {
-        $this->_oCommand->execute('svn mergeinfo --show-revs eligible ' . $this->_oConfig->remote . ' ' . $this->_oConfig->path);
-        if ($this->_oCommand->isSuccess() !== true) {
-            $this->_bContinue = false;
-        }
+        $oDiff = new mergy_Util_Diff_Renderer();
+        $oDiff->revisions($this->_oConfig->mergeRevisions)->render();
+        unset($oDiff);
 
         return $this;
     }
