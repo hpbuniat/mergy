@@ -66,7 +66,7 @@ class mergy_Action_Concrete_Command extends mergy_Action_AbstractAction {
         if (empty($this->_oProperties->command) !== true) {
             $this->_oCommand->execute($this->_oProperties->command);
             if ($this->_oCommand->isSuccess() !== true) {
-                $this->_bContinue = false;
+                $this->_bSuccess = false;
             }
         }
 

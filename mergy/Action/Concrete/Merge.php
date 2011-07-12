@@ -70,7 +70,7 @@ class mergy_Action_Concrete_Merge extends mergy_Action_AbstractAction {
      *
      * @var string
      */
-    const PROBLEM = 'A problem (e.g. a conflict) occured while merging. Take a look at the working-copy and proceed with --continue';
+    const PROBLEM = 'A problem (e.g. a conflict) occured while merging. Take a look at the working-copy, press enter when finished';
 
     /**
      * Toggle revision-mode for merge
@@ -110,7 +110,7 @@ class mergy_Action_Concrete_Merge extends mergy_Action_AbstractAction {
 
         $sResult = $this->_oCommand->get();
         if ($this->_oCommand->isSuccess() !== true or strpos($sResult, 'Summary of conflicts') !== false) {
-            $this->_bContinue = false;
+            $this->_bSuccess = false;
         }
 
         if (defined('VERBOSE') === true and VERBOSE === true) {

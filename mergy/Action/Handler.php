@@ -177,10 +177,7 @@ class mergy_Action_Handler {
                 $oMerge->revision($oRevision->iRevision);
             }
 
-            $oMerge->execute();
-            if ($oMerge->isSuccess() !== true) {
-                throw new Exception($oMerge::PROBLEM);
-            }
+            $oMerge->execute($oMerge::PROBLEM);
         }
 
         return $this;

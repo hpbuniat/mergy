@@ -65,7 +65,7 @@ class mergy_Action_Concrete_Revert extends mergy_Action_AbstractAction {
     protected function _execute() {
         $this->_oCommand->execute('svn revert --non-interactive -R -q ' . $this->_oConfig->path);
         if ($this->_oCommand->isSuccess() !== true) {
-            $this->_bContinue = false;
+            $this->_bSuccess = false;
         }
 
         $this->_oCommand->execute('svn status --no-ignore ' . $this->_oConfig->path . ' | grep -e ^\? -e ^I | awk \'{print $2}\'| xargs -r rm -r');

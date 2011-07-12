@@ -73,11 +73,11 @@ abstract class mergy_Action_AbstractAction {
     protected $_oCommand;
 
     /**
-     * Continue-Decision
+     * Was the action executed successful ?
      *
      * @var boolean
      */
-    protected $_bContinue = true;
+    protected $_bSuccess = true;
 
     /**
      * Default MSG-Text
@@ -118,7 +118,7 @@ abstract class mergy_Action_AbstractAction {
      * @return boolean
      */
     public function isSuccess() {
-        return (bool) $this->_bContinue;
+        return (bool) $this->_bSuccess;
     }
 
     /**
@@ -143,27 +143,36 @@ abstract class mergy_Action_AbstractAction {
     /**
      * Execute an action
      *
+     * @param  string $sMessage The Message to show
+     * @param  array $aExpected The expected input - needs keys continue & abort
+     *
      * @return mergy_Action_AbstractAction
      */
-    public function execute() {
+    public function execute($sMessage = '', array $aExpected = array()) {
         $bExecute = true;
         if (isset($this->_oProperties->skiponcontinue) === true and $this->_oProperties->skiponcontinue === true and $this->_oConfig->continue === true) {
             $bExecute = false;
         }
 
-        return ($bExecute === true) ? $this->_execute()->_confirm() : $this;
+        if ($bExecute === true) {
+            $this->_execute();
+            if ($this->isSuccess() !== true and empty($sMessage) !== true) {
+                $this->_confirm($sMessage, $aExpected);
+            }
+        }
+
+        return $this;
     }
 
     /**
      * Confirm the result of an action
      *
-     * @param  boolean $bEnter
-     * @param  string $sMessage
-     * @param  string $sExpected
+     * @param  string $sMessage The Message to show
+     * @param  array $aExpected The expected input - needs keys continue & abort
      *
      * @return mergy_Action_AbstractAction
      */
-    protected function _confirm($bEnter = true, $sMessage = '', $sExpected = '') {
+    protected function _confirm($sMessage = '', array $aExpected = array()) {
         if (isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true) {
             $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
             mergy_TextUI_Output::info(sprintf($sMessage, $this->getName()));
@@ -171,7 +180,13 @@ abstract class mergy_Action_AbstractAction {
                 $rInput = fopen('php://stdin', 'r');
                 $sInput = trim(fgets($rInput));
             }
-            while ($sInput === $sExpected and $bEnter !== true);
+            while (in_array($sInput, $aExpected) === false and empty($aExpected) !== true);
+
+            if (isset($aExpected['abort']) === true and $sInput === $aExpected['abort']) {
+                mergy_TextUI_Output::info('aborting ...');
+                throw new Exception($this::PROBLEM);
+            }
+
             mergy_TextUI_Output::info('continuing ...');
         }
 

@@ -65,7 +65,7 @@ class mergy_Action_Concrete_Unmerged extends mergy_Action_AbstractAction {
     protected function _execute() {
         $this->_oCommand->execute('svn mergeinfo --show-revs eligible ' . $this->_oConfig->remote . ' ' . $this->_oConfig->path);
         if ($this->_oCommand->isSuccess() !== true) {
-            $this->_bContinue = false;
+            $this->_bSuccess = false;
         }
 
         return $this;

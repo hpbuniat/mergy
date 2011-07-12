@@ -84,9 +84,14 @@ class mergy_Revision_Aggregator {
      */
     public function run() {
         foreach ($this->_aArguments['revisions'] as $sRevision) {
-            $oRevision = new mergy_Revision($this->_aArguments['config']->remote, $sRevision);
-            $this->_aRevisions[] = $oRevision->read()->diff();
+            $this->_aRevisions[] = new mergy_Revision($this->_aArguments['config']->remote, $sRevision);
         }
+
+        $oParallel = new mergy_Util_Parallel($this->_aRevisions);
+        $this->_aRevisions = $oParallel->run(array(
+            'read',
+            'diff'
+        ))->get();
 
         return $this;
     }

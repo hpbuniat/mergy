@@ -131,7 +131,7 @@ class mergy_Revision {
             $oCache = new mergy_Revision_Diff($this->sRepository, $this->iRevision, $aFile['path'], $aFile['type']);
             $this->aDiffs[] = array(
                 'file' => $aFile['path'],
-                'diff' => $oCache->get(),
+                'diff' => (string) $oCache->get(),
                 'type' => $aFile['type'],
             );
         }
@@ -181,8 +181,8 @@ class mergy_Revision {
                 $sPath = (string) $oPath;
                 if (strlen($sPath) > 0 and isset($aAttributes->kind) === true and (string )$aAttributes->kind === 'file') {
                     $this->aFiles[] = array(
-                        'type' => $aAttributes->item,
-                        'path' => $sPath
+                        'type' => (string) $aAttributes->item,
+                        'path' => (string) $sPath
                     );
                 }
             }
