@@ -28,4 +28,5 @@ mergy.sh [--remote=[repository|branch]]     // remote repository, might be only 
          [--diff]                           // create a diff, based on the revisions to merge
          [--all]                            // use all unmerged revisions
          [--diff-all]                       // equals --diff --all
+         [--strict]                         // only merge, what was given - no force via config
          [--verbose]                        // verbose
