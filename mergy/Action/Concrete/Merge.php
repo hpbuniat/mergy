@@ -109,7 +109,7 @@ class mergy_Action_Concrete_Merge extends mergy_Action_AbstractAction {
         $this->_oCommand->execute($sCommand);
 
         $sResult = $this->_oCommand->get();
-        if ($this->_oCommand->isSuccess() !== true or strpos($sResult, 'Summary of conflicts') !== false) {
+        if ($this->_oCommand->isSuccess() !== true or strpos($sResult, 'Summary of conflicts') !== false or strpos($sResult, 'Konfliktübersicht') !== false) {
             $this->_bSuccess = false;
         }
 
