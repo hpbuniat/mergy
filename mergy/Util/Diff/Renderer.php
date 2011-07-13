@@ -172,7 +172,7 @@ class mergy_Util_Diff_Renderer {
      * @return mergy_Util_Diff_Creator
      */
     protected function _addDiff(DOMElement $oContainer, $aDiff, mergy_Revision $oRevision) {
-        $bDiff = (strlen($aDiff['diff']) > 0) ? true : false;
+        $bDiff = (strlen($aDiff['diff']) > 0 or $aDiff['type'] === 'added') ? true : false;
 
         $oDiv = $this->_oHtml->createElement('div');
         $oH4 = $this->_oHtml->createElement('h4', sprintf((($bDiff === true) ? self::FILE_TEXT : self::NO_DIFF), $aDiff['file'], $oRevision->iRevision));
