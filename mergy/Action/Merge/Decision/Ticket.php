@@ -59,8 +59,16 @@ class mergy_Action_Merge_Decision_Ticket extends mergy_Action_Merge_AbstractDeci
         if (isset($this->_oConfig->tickets) and is_array($this->_oConfig->tickets) === true) {
 
             $aMatches = array();
-            preg_match('/id=(\d+)/', $oRevision->sInfo, $aMatches);
-            if (isset($aMatches[1]) and in_array($aMatches[1], $this->_oConfig->tickets) === true) {
+            preg_match('/id=(\d+)|(bug|ticket)\s?(\d+)/i', $oRevision->sInfo, $aMatches);
+            $sId = false;
+            if (empty($aMatches[1]) !== true) {
+                $sId = $aMatches[1];
+            }
+            elseif (empty($aMatches[3]) !== true) {
+                $sId = $aMatches[3];
+            }
+
+            if ($sId !== false and in_array($sId, $this->_oConfig->tickets) === true) {
                 return true;
             }
         }

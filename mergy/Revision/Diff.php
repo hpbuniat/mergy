@@ -56,28 +56,33 @@ class mergy_Revision_Diff extends mergy_Revision_SvnAbstract {
      * @see mergy_Util_Cacheable::_get()
      */
     protected function _get() {
-        $sSwitch = '-c';
+        $bDiff = true;
         switch ($this->_sType) {
             case 'deleted':
-                $this->_mCache = '';
-                return $this;
+                $bDiff = false;
+                break;
 
             case 'added':
-                $sSwitch = '-r';
+                $sSwitch = '@';
+                $sCommand = 'cat';
                 break;
 
             default:
-                $sSwitch = '-c';
+                $sSwitch = ' -c ';
+                $sCommand = 'diff';
+                break;
         }
 
-        $sCommand = 'svn diff ' . $this->_sPath . ' ' . $sSwitch . ' ' . $this->_iRevision;
-        $oCommand = new mergy_Util_Command($sCommand);
-        $oCommand->execute();
+        if ($bDiff === true) {
+            $sCommand = 'svn ' . $sCommand . ' "' . $this->_sPath . '"' . $sSwitch . $this->_iRevision;
+            $oCommand = new mergy_Util_Command($sCommand);
+            $oCommand->execute();
 
-        $this->_mCache = $oCommand->get();
-        if ($oCommand->isSuccess() !== true) {
-            $this->_mCache = '';
-            mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
+            $this->_mCache = $oCommand->get();
+            if ($oCommand->isSuccess() !== true) {
+                $this->_mCache = '';
+                mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
+            }
         }
 
         return $this;

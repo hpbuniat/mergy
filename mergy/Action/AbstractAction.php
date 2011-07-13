@@ -156,7 +156,8 @@ abstract class mergy_Action_AbstractAction {
 
         if ($bExecute === true) {
             $this->_execute();
-            if ($this->isSuccess() !== true and empty($sMessage) !== true) {
+            if (($this->isSuccess() !== true and empty($sMessage) !== true)
+                or (isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true)) {
                 $this->_confirm($sMessage, $aExpected);
             }
         }
@@ -173,22 +174,20 @@ abstract class mergy_Action_AbstractAction {
      * @return mergy_Action_AbstractAction
      */
     protected function _confirm($sMessage = '', array $aExpected = array()) {
-        if (isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true) {
-            $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
-            mergy_TextUI_Output::info(sprintf($sMessage, $this->getName()));
-            do {
-                $rInput = fopen('php://stdin', 'r');
-                $sInput = trim(fgets($rInput));
-            }
-            while (in_array($sInput, $aExpected) === false and empty($aExpected) !== true);
-
-            if (isset($aExpected['abort']) === true and $sInput === $aExpected['abort']) {
-                mergy_TextUI_Output::info('aborting ...');
-                throw new Exception($this::PROBLEM);
-            }
-
-            mergy_TextUI_Output::info('continuing ...');
+        $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
+        mergy_TextUI_Output::info(sprintf($sMessage, $this->getName()));
+        do {
+            $rInput = fopen('php://stdin', 'r');
+            $sInput = trim(fgets($rInput));
         }
+        while (in_array($sInput, $aExpected) === false and empty($aExpected) !== true);
+
+        if (isset($aExpected['abort']) === true and $sInput === $aExpected['abort']) {
+            mergy_TextUI_Output::info('aborting ...');
+            throw new Exception($this::PROBLEM);
+        }
+
+        mergy_TextUI_Output::info('continuing ...');
 
         return $this;
     }

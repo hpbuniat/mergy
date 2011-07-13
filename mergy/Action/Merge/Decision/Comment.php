@@ -57,9 +57,8 @@ class mergy_Action_Merge_Decision_Comment extends mergy_Action_Merge_AbstractDec
      */
     public function decide(mergy_Revision $oRevision) {
         if (isset($this->_oConfig->force) and is_array($this->_oConfig->force) === true) {
-
             foreach ($this->_oConfig->force as $sComment) {
-                if (stripos($oRevision->sInfo, $sComment)) {
+                if (stripos($oRevision->sInfo, $sComment) !== false) {
                     return true;
                 }
             }

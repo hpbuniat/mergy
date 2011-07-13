@@ -96,6 +96,7 @@ class mergy_TextUI_Command {
         'list' => false,
         'diff' => false,
         'all' => false,
+        'strict' => false,
         'remote' => ''
     );
 
@@ -119,6 +120,7 @@ class mergy_TextUI_Command {
         'path=' => null,
         'continue' => null,
         'reintegrate' => null,
+        'strict' => null,
         'help' => null,
         'verbose' => null,
         'list' => null,
@@ -231,6 +233,10 @@ class mergy_TextUI_Command {
                     $this->_aArguments['force-comment'] = $option[1];
                     break;
 
+                case '--strict':
+                    $this->_aArguments['strict'] = true;
+                    break;
+
                 case '--remote':
                     $this->_aArguments['remote'] = $option[1];
                     break;
@@ -315,6 +321,9 @@ class mergy_TextUI_Command {
 
         $this->_aArguments['config']->tickets = explode(",", $this->_aArguments['config']->tickets);
         $this->_aArguments['config']->force = explode(",", $this->_aArguments['config']->force);
+        if ($this->_aArguments['strict'] === true) {
+            $this->_aArguments['config']->force = false;
+        }
 
         mergy_Util_Registry::set('_CONFIG', $this->_aArguments['config']);
         $oAction = new mergy_Action($this->_aArguments['config']);

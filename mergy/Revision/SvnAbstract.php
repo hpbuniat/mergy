@@ -97,7 +97,7 @@ abstract class mergy_Revision_SvnAbstract extends mergy_Util_Cacheable {
         $this->_iRevision = $iRevision;
         $this->_sRepository = $sRepository;
         $this->_sPath = $sPath;
-        $this->_sType = $sType;
+        $this->_sType = strtolower(trim((string) $sType));
         $this->_id();
     }
 
