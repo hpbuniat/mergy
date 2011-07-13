@@ -104,6 +104,8 @@ class mergy_Util_Parallel {
         if (is_dir(mergy_Util_Cacheable::DIR) !== true) {
             mkdir(mergy_Util_Cacheable::DIR, 0744, true);
         }
+
+        $this->_iThreads = self::THREADS;
     }
 
     /**
