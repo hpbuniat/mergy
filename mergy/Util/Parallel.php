@@ -141,7 +141,7 @@ class mergy_Util_Parallel {
      * @return ParallelTests
      */
     public function run(array $aMethods = array()) {
-        $this->_rShared = shm_attach(ftok(tempnam(mergy_Util_Cacheable::DIR, __FILE__), 'a'), '1048576');
+        $this->_rShared = shm_attach(ftok(tempnam(mergy_Util_Cacheable::DIR, __FILE__ . microtime(true)), 'a'), 4194304);
         foreach (array_keys($this->_aStack) as $iStack) {
             $iChildren = count($this->_aProc);
             if ($iChildren < $this->_iThreads or $this->_iThreads === 0) {
@@ -161,6 +161,7 @@ class mergy_Util_Parallel {
 
         $this->_wait(true)->_read();
 
+        shm_remove($this->_rShared);
         shm_detach($this->_rShared);
         return $this;
     }
@@ -178,7 +179,7 @@ class mergy_Util_Parallel {
             $this->_aStack[$iStack]->$sMethod();
         }
 
-        shm_put_var($this->_rShared, $iStack, $this->_aStack[$iStack]);
+        $bPut = shm_put_var($this->_rShared, $iStack, $this->_aStack[$iStack]);
 
         posix_kill(getmypid(), 9);
         return $this;
