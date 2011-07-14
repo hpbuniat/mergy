@@ -114,7 +114,7 @@ class mergy_Action_Concrete_Merge extends mergy_Action_AbstractAction {
             $this->_bSuccess = false;
         }
 
-        if (defined('VERBOSE') === true and VERBOSE === true) {
+        if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
             mergy_TextUI_Output::info($sResult);
         }
 
