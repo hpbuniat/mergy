@@ -171,7 +171,9 @@ class mergy_TextUI_Command {
         $aRevisions = $oAggregator->set($this->_aArguments)->run()->get();
         if ($this->_aArguments['list'] === true) {
             foreach ($aRevisions as $oRevision) {
-                mergy_TextUI_Output::info($oRevision->__toString());
+                if ($oRevision instanceof mergy_Revision) {
+                    mergy_TextUI_Output::info($oRevision->__toString());
+                }
             }
         }
 

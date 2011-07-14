@@ -63,18 +63,18 @@ class mergy_Revision_Diff extends mergy_Revision_SvnAbstract {
                 break;
 
             case 'added':
-                $sSwitch = '@';
+                $sSwitch = '@' . $this->_iRevision;
                 $sCommand = 'cat';
                 break;
 
             default:
-                $sSwitch = ' -c ';
+                $sSwitch = '@' . $this->_iRevision . ' -c ' . $this->_iRevision;
                 $sCommand = 'diff';
                 break;
         }
 
         if ($bDiff === true) {
-            $sCommand = 'svn ' . $sCommand . ' "' . $this->_sPath . '"' . $sSwitch . $this->_iRevision;
+            $sCommand = 'svn ' . $sCommand . ' "' . $this->_sPath . '"' . $sSwitch;
             $oCommand = new mergy_Util_Command($sCommand);
             $oCommand->execute();
 

@@ -92,6 +92,7 @@ abstract class mergy_Revision_SvnAbstract extends mergy_Util_Cacheable {
      * @param  string $sRepository
      * @param  int $iRevision
      * @param  string $sPath
+     * @param  string $sType
      */
     public function __construct($sRepository, $iRevision, $sPath = null, $sType = null) {
         $this->_iRevision = $iRevision;
@@ -106,7 +107,7 @@ abstract class mergy_Revision_SvnAbstract extends mergy_Util_Cacheable {
      * @see mergy_Util_Cacheable::_id()
      */
     protected function _id() {
-        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . get_class($this));
+        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . $this->_sType . get_class($this));
         return $this->_file();
     }
 }
