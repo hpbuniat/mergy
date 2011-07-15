@@ -329,7 +329,7 @@ class mergy_TextUI_Command {
 
         mergy_Util_Registry::set('_CONFIG', $this->_aArguments['config']);
         $oAction = new mergy_Action($this->_aArguments['config']);
-        if ($this->_aArguments['config']->continue !== true and $this->_aArguments['list'] !== true) {
+        if ($this->_aArguments['config']->continue !== true) {
             $oAction->setup()->init();
         }
 
