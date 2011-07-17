@@ -73,13 +73,6 @@ class mergy_TextUI_Command {
     const CONFIG_FILE = 'mergy.json';
 
     /**
-     * Error when there are no revisions to merge
-     *
-     * @var string
-     */
-    const NO_REVISIONS_TO_MERGE = 'There are no more revisions to merge!';
-
-    /**
      * Error when there is no config-file found
      *
      * @var string
@@ -91,44 +84,7 @@ class mergy_TextUI_Command {
      *
      * @var array
      */
-    protected $_aArguments = array(
-        'verbose' => false,
-        'list' => false,
-        'diff' => false,
-        'all' => false,
-        'strict' => false,
-        'remote' => ''
-    );
-
-    /**
-     * Short-Options
-     *
-     * @var array
-     */
-    protected $_aOptions = array();
-
-    /**
-     * Long-Options
-     *
-     * @var array
-     */
-    protected $_aLongOptions = array(
-        'remote=' => null,
-        'ticket=' => null,
-        'force=' => null,
-        'rev=' => null,
-        'path=' => null,
-        'continue' => null,
-        'reintegrate' => null,
-        'strict' => null,
-        'help' => null,
-        'verbose' => null,
-        'list' => null,
-        'diff' => null,
-        'all' => null,
-        'diff-all' => null,
-        'version' => null
-    );
+    protected $_aArguments = array();
 
     /**
      * Argument to config mapping
@@ -141,8 +97,16 @@ class mergy_TextUI_Command {
         'tickets' => 'tickets',
         'reintegrate' => 'reintegrate',
         'continue' => 'continue',
+        'more' => 'more',
         'force-comment' => 'force'
     );
+
+    /**
+     * Track more single mergy-calls to create a commit message
+     *
+     * @var mergy_Util_Merge_Tracker
+     */
+    protected $_oMergeTracker = null;
 
     /**
      * Main entry
@@ -165,7 +129,7 @@ class mergy_TextUI_Command {
      * @TODO Cleanup !
      */
     public function run(array $argv, $exit = true) {
-        $this->handleArguments($argv);
+        $this->_handleArguments($argv);
 
         $oAggregator = new mergy_Revision_Aggregator();
         $aRevisions = $oAggregator->set($this->_aArguments)->run()->get();
@@ -194,6 +158,10 @@ class mergy_TextUI_Command {
             $oAction->pre()->merge()->post();
         }
 
+        if ($this->_aArguments['config']->more !== true) {
+            $this->_oMergeTracker->clean();
+        }
+
         return $this;
     }
 
@@ -206,88 +174,10 @@ class mergy_TextUI_Command {
      *
      * @TODO Cleanup!
      */
-    protected function handleArguments(array $argv) {
+    protected function _handleArguments(array $argv) {
         self::printVersionString();
 
-        $oConsole = new Console_Getopt();
-        try {
-            $this->_aOptions = @$oConsole->getopt($argv, '', array_keys($this->_aLongOptions));
-        }
-        catch (RuntimeException $e) {
-            mergy_TextUI_Output::info($e->getMessage());
-        }
-
-        if ($this->_aOptions instanceof PEAR_Error) {
-            mergy_TextUI_Output::error($this->_aOptions->getMessage());
-        }
-
-        foreach ($this->_aOptions[0] as $option) {
-            switch ($option[0]) {
-                case '--rev':
-                    $this->_aArguments['cliRevisions'] = $option[1];
-                    break;
-
-                case '--ticket':
-                    $this->_aArguments['tickets'] = $option[1];
-                    break;
-
-                case '--force':
-                    $this->_aArguments['force-comment'] = $option[1];
-                    break;
-
-                case '--strict':
-                    $this->_aArguments['strict'] = true;
-                    break;
-
-                case '--remote':
-                    $this->_aArguments['remote'] = $option[1];
-                    break;
-
-                case '--config':
-                    $this->_aArguments['config'] = $option[1];
-                    break;
-
-                case '--path':
-                    $this->_aArguments['path'] = $option[1];
-                    break;
-
-                case '--continue':
-                    $this->_aArguments['continue'] = true;
-                    break;
-
-                case '--reintegrate':
-                    $this->_aArguments['reintegrate'] = true;
-                    break;
-
-                case '--verbose':
-                    $this->_aArguments['verbose'] = true;
-                    break;
-
-                case '--list':
-                    $this->_aArguments['list'] = true;
-                    break;
-
-                case '--diff':
-                    $this->_aArguments['diff'] = true;
-                    break;
-
-                case '--all':
-                    $this->_aArguments['all'] = true;
-                    break;
-
-                case '--diff-all':
-                    $this->_aArguments['diff'] = true;
-                    $this->_aArguments['all'] = true;
-                    break;
-
-                case '--help':
-                case '--version':
-                    $this->showHelp();
-                    exit(self::SUCCESS_EXIT);
-                    break;
-            }
-        }
-
+        $this->_aArguments = mergy_TextUI_Parameter::parse($argv, $this);
         if (defined('VERBOSE') === false) {
             define('VERBOSE', $this->_aArguments['verbose']);
         }
@@ -327,80 +217,28 @@ class mergy_TextUI_Command {
             $this->_aArguments['config']->force = false;
         }
 
-        mergy_Util_Registry::set('_CONFIG', $this->_aArguments['config']);
+
+        $this->_oMergeTracker = new mergy_Util_Merge_Tracker($this->_aArguments['config']);
         $oAction = new mergy_Action($this->_aArguments['config']);
         if ($this->_aArguments['config']->continue !== true) {
             $oAction->setup()->init();
+            $this->_oMergeTracker->clean();
         }
 
         try {
-            $sRevisions = $oAction->command('Unmerged');
-            $this->_handleRevisions($sRevisions);
+            $this->_aArguments = mergy_TextUI_Parameter::revisions($this->_aArguments, $oAction->command('Unmerged'));
         }
-        catch (Exception $e) {
-            mergy_TextUI_Output::error(self::NO_REVISIONS_TO_MERGE);
+        catch (Exception $oException) {
+            mergy_TextUI_Output::error($oException->getMessage());
             exit();
         }
 
-        unset($oAction, $oConsole);
+        $aTrackedTickets = $this->_oMergeTracker->get();
+        sort($aTrackedTickets);
+        $this->_aArguments['config']->tracked = $aTrackedTickets;
 
-        return $this;
-    }
-
-    /**
-     * Handle revisions (from repo and cli)
-     *
-     * @param  string $sRevisions
-     *
-     * @return mergy_TextUI_Command
-     *
-     * @throws Exception
-     *
-     * @TODO Move this to a class
-     */
-    protected function _handleRevisions($sRevisions = '') {
-        $this->_aArguments['revisions'] = array();
-
-        $aRevisions = explode("\n", $sRevisions);
-        if (empty($this->_aArguments['cliRevisions']) !== true) {
-            $aCliRevisions = explode(',', $this->_aArguments['cliRevisions']);
-            foreach ($aCliRevisions as $iIndex => $sRevision) {
-                if (stripos($sRevision, '-') !== false) {
-                    $aRange = explode('-', $sRevision);
-                    $iStart = reset($aRange);
-                    $iEnd = end($aRange);
-                    do {
-                        $aCliRevisions[] = $iStart++;
-                    }
-                    while ($iStart <= $iEnd);
-                    unset($aCliRevisions[$iIndex]);
-                }
-            }
-
-            $aRevisions = array_merge($aRevisions, $aCliRevisions);
-            $this->_aArguments['config']->revisions = $aCliRevisions;
-            unset($this->_aArguments['cliRevisions']);
-        }
-
-        foreach ($aRevisions as $sRevision) {
-            $iRevision = (int) trim((substr($sRevision, 0, 1) === 'r') ? substr($sRevision, 1) : $sRevision);
-            if ($iRevision > 0) {
-                $this->_aArguments['revisions'][] = $iRevision;
-            }
-        }
-
-        if ($this->_aArguments['config']->reintegrate === true) {
-            $this->_aArguments['config']->revisions = $this->_aArguments['revisions'] = array(
-                'HEAD'
-            );
-        }
-
-        if (empty($this->_aArguments['revisions']) === true) {
-            throw new Exception(self::NO_REVISIONS_TO_MERGE);
-        }
-
-        $this->_aArguments['revisions'] = array_unique($this->_aArguments['revisions']);
-        sort($this->_aArguments['revisions']);
+        mergy_Util_Registry::set('_CONFIG', $this->_aArguments['config']);
+        unset($oAction);
 
         return $this;
     }
@@ -410,20 +248,27 @@ class mergy_TextUI_Command {
      *
      * @return void
      */
-    protected function showHelp() {
+    public function showHelp() {
         echo <<<EOT
 Usage: mergy [switches]
+      [--remote=[repository|branch]]     // remote repository, might be only a branch-name
+      [--rev=revision[,revision]]        // revisions to merge (might have been merged before)
+      [--ticket=ticket-id[,ticket-id]]   // find all revisions of a ticket
+      [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
+      [--reintegrate]                    // reintegrate a whole branch - without specific revisions
+      [--list]                           // list unmerged revisions from repository
+      [--diff]                           // create a diff, based on the revisions to merge
+      [--all]                            // use all unmerged revisions
+      [--diff-all]                       // equals --diff --all
+      [--strict]                         // only merge, what was given - no force via config
+      [--commit]                         // commit changes in the wc - with tracked log, if present
+      [--more]                           // skip commit
 
-  --remote=[repository|branch]     // remote repository, might be only a branch-name
-  --rev=revision[,revision]        // revisions to merge (might have been merged before)
-  --force=keyword[,keyword]        // keywords to force merge of this revisons, if unmerged
-  --ticket=ticket-id[,ticket-id]   // find all revisions of a ticket
-  --config=mergy.json              // use this config-file
-  --path=[PATH_TO_WC]              // use this working copy (instead of .)
-  --continue                       // continue skips the pre-merge-actions (e.g. after conflict)
-  --reintegrate                    // reintegrate a whole branch - without specific revisions
-  --list                           // list unmerged revisions from repository
-  --verbose                        // verbose
+      // further parameters
+      [--verbose]                        // verbose
+      [--force=keyword[,keyword]]        // keywords to force merge of this revisons, if unmerged
+      [--config=mergy.json]              // use this config-file
+      [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
 EOT;
     }
 
