@@ -1,6 +1,7 @@
 {
     "path": ".",
-    "remote": "your-repo",
+    "remote": "your repo",
+    "issues": "your issue tracking",
     "init": {
         "revert": {
         }
