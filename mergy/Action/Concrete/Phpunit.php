@@ -66,10 +66,8 @@ class mergy_Action_Concrete_Phpunit extends mergy_Action_AbstractAction {
         $this->_oCommand->execute('cd ' . $this->_oConfig->path . ';' . $this->_oProperties->command);
 
         $this->_bSuccess = true;
-        if (isset($this->_oProperties->failonerror) === true and $this->_oProperties->failonerror === true) {
-            if ($this->_oCommand->isSuccess() !== true) {
-                $this->_bSuccess = false;
-            }
+        if ($this->_oCommand->isSuccess() !== true) {
+            $this->_bSuccess = false;
         }
 
         if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
