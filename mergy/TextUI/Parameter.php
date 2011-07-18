@@ -155,7 +155,15 @@
                     self::$_aArguments['path'] = $option[1];
                     break;
 
+                case '--more':
+                    self::$_aArguments['more'] = true;
+                    break;
+
                 case '--continue':
+                    self::$_aArguments['continue'] = true;
+                    break;
+
+                case '--commit':
                     self::$_aArguments['continue'] = true;
                     break;
 

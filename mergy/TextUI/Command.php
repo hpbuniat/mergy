@@ -230,7 +230,7 @@ class mergy_TextUI_Command {
         }
         catch (Exception $oException) {
             mergy_TextUI_Output::error($oException->getMessage());
-            exit();
+            exit(self::ERROR_EXIT);
         }
 
         $aTrackedTickets = $this->_oMergeTracker->get();
