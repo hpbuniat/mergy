@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Action to commit
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,40 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Action_Concrete_Commit extends Mergy_Action_AbstractAction {
 
     /**
-     * Test Command-Setting via construct
+     * Failure description
+     *
+     * @var string
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
+    const PROBLEM = 'Commit failed';
 
     /**
-     * Test Command-Setting via command-method
+     * (non-PHPdoc)
+     * @see Mergy_Action_AbstractAction::_execute()
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
+    protected function _execute() {
+        if ($this->_oConfig->more !== true) {
+            $sMessage = '-- merged with ' . $this->_oConfig->remote . PHP_EOL
+                      . '-- by mergy' . PHP_EOL . PHP_EOL;
 
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+            foreach ($this->_oConfig->tracked as $sTicket) {
+                $sMessage .= '-- ' . $this->_oConfig->issues . $sTicket . PHP_EOL;
+            }
+
+            $this->_oCommand->execute('svn ci ' . $this->_oConfig->path . ' --message "' . $sMessage . '"');
+
+            $this->_bSuccess = true;
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_bSuccess = false;
+            }
+
+            if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
+                Mergy_TextUI_Output::info($this->_oCommand->get());
+            }
+        }
+
+        return $this;
     }
 }

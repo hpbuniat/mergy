@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Log Merge-Actions, to track params and create a commit message
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,85 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Util_Merge_Tracker {
 
     /**
-     * Test Command-Setting via construct
+     * Cache-File to track the data
+     *
+     * @var string
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_sFile;
+
+    /**
+     * Merged tickets
+     *
+     * @var array
+     */
+    protected $_aTickets = array();
+
+    /**
+     * The Configuration
+     *
+     * @var stdClass
+     */
+    protected $_oConfig;
+
+    /**
+     * Create a new tracker
+     *
+     * @param stdClass $oConfig
+     */
+    public function __construct(stdClass $oConfig) {
+        $this->_oConfig = $oConfig;
+        $this->_sFile = Mergy_Util_Cacheable::DIR . md5($this->_oConfig->remote);
+        $this->_read();
+        $this->_aTickets = array_merge($this->_aTickets, $this->_oConfig->tickets);
+        $this->_write();
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Get the data
+     *
+     * @return array
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    public function get() {
+        return $this->_aTickets;
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * Remove saved data
+     *
+     * @return Mergy_Util_Merge_Tracker
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    public function clean() {
+        $this->_aTickets = $this->_oConfig->tickets;
+        if (file_exists($this->_sFile) === true) {
+            unlink($this->_sFile);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Read saved data
+     *
+     * @return Mergy_Util_Merge_Tracker
+     */
+    protected function _read() {
+        if (file_exists($this->_sFile) === true) {
+            $this->_aTickets = unserialize(file_get_contents($this->_sFile));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Write the data
+     *
+     * @return Mergy_Util_Merge_Tracker
+     */
+    protected function _write() {
+        file_get_contents($this->_sFile, serialize($this->_aTickets));
+        return $this;
     }
 }

@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Build an action-object
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,50 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Action_Builder {
 
     /**
-     * Test Command-Setting via construct
+     * The Action-Handler
+     *
+     * @var Mergy_Action_Handler
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_oHandler;
+
+    /**
+     * Mergy-Config
+     *
+     * @var stdClass
+     */
+    protected $_oConfig;
+
+    /**
+     * Create the Action-Builder
+     *
+     * @param Mergy_Action_Handler $oHandler
+     * @param stdClass $oConfig
+     */
+    public function __construct(Mergy_Action_Handler $oHandler, stdClass $oConfig) {
+        $this->_oHandler = $oHandler;
+        $this->_oConfig = $oConfig;
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Build a Action and add it to the handler
+     *
+     * @param  string $sType
+     * @param  stdClass $oConfig
+     * @param  string $sStep
+     *
+     * @return Mergy_Action_Builder
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
+    public function build($sType, stdClass $oConfig, $sStep = null) {
+        $sType = ucfirst(strtolower((isset($oConfig->type) === true) ? $oConfig->type : $sType));
+        $sClass = str_replace('Builder', 'Concrete', get_class($this)) . '_' . $sType;
+        if (class_exists($sClass) === true) {
+            $oAction = new $sClass($this->_oConfig, $oConfig);
+            $this->_oHandler->add($oAction, strtolower($sStep));
+        }
 
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+        return $this;
     }
 }

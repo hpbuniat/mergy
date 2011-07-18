@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Action to execute the merge itself
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,75 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Action_Concrete_Merge extends Mergy_Action_AbstractAction {
 
     /**
-     * Test Command-Setting via construct
+     * Current revision-/merge-string
+     *
+     * @var string
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_sRevision;
+
+    /**
+     * Failure description
+     *
+     * @var string
+     */
+    const INVALID_REVISION = 'Invalid Revision';
+
+    /**
+     * Failure description
+     *
+     * @var string
+     */
+    const PROBLEM = 'A problem (e.g. a conflict) occured while merging. Take a look at the working-copy, press enter when finished';
+
+    /**
+     * Toggle revision-mode for merge
+     *
+     * @param  int $iRevision
+     *
+     * @return Mergy_Action_AbstractAction
+     */
+    public function revision($iRevision) {
+        $iRevision = (int) $iRevision;
+        if (($iRevision > 0) !== true) {
+            throw new Exception(self::INVALID_REVISION);
+        }
+
+        $this->_sRevision = '-c ' . $iRevision;
+
+        return $this;
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Toggle reintegrate-mode for merge
+     *
+     * @return Mergy_Action_AbstractAction
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    public function reintegrate() {
+        $this->_sRevision = '--reintegrate';
+        return $this;
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * (non-PHPdoc)
+     * @see Mergy_Action_AbstractAction::_execute()
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    protected function _execute() {
+        $sCommand = 'svn merge ' . $this->_oConfig->remote . ' --accept postpone --non-interactive ' . $this->_sRevision . ' ' . $this->_oConfig->path . ' | awk \'{a["A"]=32;a["U"]=34;a["C"]=31;a["M"]=34;a["G"]=37;a["?"]=33;a["D"]=36;printf("\033[1;%sm%s\033[0;00m\n",a[$1],$0)}\'';
+        $this->_oCommand->execute($sCommand);
+
+        $sResult = $this->_oCommand->get();
+        // @FIXME: Better conflict check!
+        if ($this->_oCommand->isSuccess() !== true or strpos($sResult, 'Summary of conflicts') !== false or strpos($sResult, 'Konfliktübersicht') !== false) {
+            $this->_bSuccess = false;
+        }
+
+        if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
+            Mergy_TextUI_Output::info($sResult);
+        }
+
+        return $this;
     }
 }

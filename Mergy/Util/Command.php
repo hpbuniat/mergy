@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Base class to execute commands as process
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,100 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Util_Command {
 
     /**
-     * Test Command-Setting via construct
+     * Process return status
+     *
+     * @var int
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_iStatus = 0;
+
+    /**
+     * The command to execute
+     *
+     * @var string
+     */
+    protected $_sCommand = '';
+
+    /**
+     * The return value
+     *
+     * @var string
+     */
+    protected $_sReturn = '';
+
+    /**
+     * Create a command-object
+     *
+     * @param string $sCommand
+     */
+    public function __construct($sCommand = null) {
+        $this->command($sCommand);
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Setter for the command
+     *
+     * @param  string $sCommand
+     *
+     * @return Mergy_Util_Command
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    public function command($sCommand = null) {
+        if (empty($sCommand) !== true) {
+            $this->_sCommand = $sCommand;
+        }
+
+        return $this;
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * Execute a command and read the output
+     *
+     * @param  string $sCommand
+     *
+     * @return Mergy_Util_Command
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    public function execute($sCommand = null) {
+        $this->command($sCommand);
+        if (defined('VERBOSE') === true and VERBOSE === true) {
+            Mergy_TextUI_Output::info($this->_sCommand);
+        }
+
+        $rCommand = popen($this->_sCommand, 'r');
+        $this->_sReturn = '';
+        while (feof($rCommand) !== true) {
+            $this->_sReturn .= fread($rCommand, 4096);
+        }
+
+        $this->_iStatus = pclose($rCommand);
+        return $this;
+    }
+
+    /**
+     * Get the output
+     *
+     * @return string
+     */
+    public function get() {
+        return $this->_sReturn;
+    }
+
+    /**
+     * Did the execution exit with success code?
+     *
+     * @return boolean
+     */
+    public function isSuccess() {
+        return ($this->_iStatus === 0);
+    }
+
+    /**
+     * Get the raw exit status-code
+     *
+     * @return int
+     */
+    public function status() {
+        return $this->_iStatus;
     }
 }

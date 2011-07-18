@@ -46,6 +46,6 @@ if (strpos('@php_bin@', '@php_bin') === 0) {
     set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
 }
 
-require 'mergy' . DIRECTORY_SEPARATOR . 'Autoload.php';
+require 'Mergy' . DIRECTORY_SEPARATOR . 'Autoload.php';
 
-mergy_TextUI_Command::main();
+Mergy_TextUI_Command::main();

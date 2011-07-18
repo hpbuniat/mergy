@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Abstract for cacheable models
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,91 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+abstract class Mergy_Util_Cacheable {
 
     /**
-     * Test Command-Setting via construct
+     * Cached data
+     *
+     * @var mixed
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_mCache;
+
+    /**
+     * Cache-Id
+     *
+     * @var string
+     */
+    protected $_sId;
+
+    /**
+     * Cache-File name
+     *
+     * @var string
+     */
+    protected $_sFile;
+
+    /**
+     * Cache-Dir
+     *
+     * @var string
+     */
+    const DIR = '/tmp/mergy/';
+
+    /**
+     * How to generate the id
+     *
+     * @return Mergy_Util_Cacheable
+     */
+    abstract protected function _id();
+
+    /**
+     * How to get the data if no cache-entry
+     *
+     * @return Mergy_Util_Cacheable
+     */
+    abstract protected function _get();
+
+    /**
+     * Generate the cache-file name
+     *
+     * @return Mergy_Util_Cacheable
+     */
+    protected function _file() {
+        $this->_sFile = self::DIR . $this->_sId;
+        return $this;
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Get the data
+     *
+     * @return mixed
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    public function get() {
+        if (file_exists($this->_sFile)) {
+            $this->_mCache = unserialize(file_get_contents($this->_sFile));
+        }
+        else {
+            $this->_get();
+            $this->write();
+        }
+
+        return $this->_mCache;
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * Write the data to cache
+     *
+     * @return Mergy_Util_Cacheable
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    public function write() {
+        if (empty($this->_mCache) !== true) {
+            if (is_dir(self::DIR) !== true) {
+                mkdir(self::DIR, 0744, true);
+            }
+
+            file_put_contents($this->_sFile, serialize($this->_mCache));
+        }
+
+        return $this;
     }
 }

@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Get diff of a modification
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,42 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Revision_Diff extends Mergy_Revision_SvnAbstract {
 
     /**
-     * Test Command-Setting via construct
+     * (non-PHPdoc)
+     * @see Mergy_Util_Cacheable::_get()
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
+    protected function _get() {
+        $bDiff = true;
+        switch ($this->_sType) {
+            case 'deleted':
+                $bDiff = false;
+                break;
 
-    /**
-     * Test Command-Setting via command-method
-     */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
+            case 'added':
+                $sSwitch = '@' . $this->_iRevision;
+                $sCommand = 'cat';
+                break;
 
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+            default:
+                $sSwitch = '@' . $this->_iRevision . ' -c ' . $this->_iRevision;
+                $sCommand = 'diff';
+                break;
+        }
+
+        if ($bDiff === true) {
+            $sCommand = 'svn ' . $sCommand . ' "' . $this->_sPath . '"' . $sSwitch;
+            $oCommand = new Mergy_Util_Command($sCommand);
+            $oCommand->execute();
+
+            $this->_mCache = $oCommand->get();
+            if ($oCommand->isSuccess() !== true) {
+                $this->_mCache = '';
+                Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
+            }
+        }
+
+        return $this;
     }
 }

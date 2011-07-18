@@ -40,47 +40,11 @@
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-/**
- * Test Command-Execution
- *
- * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @license http://www.opensource.org/licenses/bsd-license.php BSD License
- * @version Release: @package_version@
- * @link https://github.com/hpbuniat/mergy
- */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
-
-    /**
-     * Test Command-Setting via construct
-     */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
-
-    /**
-     * Test Command-Setting via command-method
-     */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
-
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
-    }
+// lightweight autoloader
+function Mergy_autoload($sClass) {
+    $sFile = str_replace('_', DIRECTORY_SEPARATOR, $sClass) . '.php';
+    @include_once $sFile;
 }
+
+
+spl_autoload_register('Mergy_autoload');

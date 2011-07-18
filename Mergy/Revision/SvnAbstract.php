@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Base class for cacheable SVN-Operations
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,65 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+abstract class Mergy_Revision_SvnAbstract extends Mergy_Util_Cacheable {
 
     /**
-     * Test Command-Setting via construct
+     * The repository of the revision
+     *
+     * @var string
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_sRepository;
+
+    /**
+     * The revisions number
+     *
+     * @var int
+     */
+    protected $_iRevision;
+
+    /**
+     * Concrete file Path
+     *
+     * @var string
+     */
+    protected $_sPath;
+
+    /**
+     * Concrete file action type
+     *
+     * @var string
+     */
+    protected $_sType;
+
+    /**
+     * Error string
+     *
+     * @var string
+     */
+    const ERROR = 'Error reading: %s';
+
+    /**
+     * Init the Revision reader
+     *
+     * @param  string $sRepository
+     * @param  int $iRevision
+     * @param  string $sPath
+     * @param  string $sType
+     */
+    public function __construct($sRepository, $iRevision, $sPath = null, $sType = null) {
+        $this->_iRevision = $iRevision;
+        $this->_sRepository = $sRepository;
+        $this->_sPath = $sPath;
+        $this->_sType = strtolower(trim((string) $sType));
+        $this->_id();
     }
 
     /**
-     * Test Command-Setting via command-method
+     * (non-PHPdoc)
+     * @see Mergy_Util_Cacheable::_id()
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
-
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    protected function _id() {
+        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . $this->_sType . get_class($this));
+        return $this->_file();
     }
 }

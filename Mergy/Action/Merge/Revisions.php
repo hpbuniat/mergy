@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Execute the decision-queue
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,80 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Action_Merge_Revisions {
 
     /**
-     * Test Command-Setting via construct
+     * Revisions to merge
+     *
+     * @var array
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    private $_aRevisions = array();
+
+    /**
+     * Decision-Queue
+     *
+     * @var array
+     */
+    private $_aQueue = array();
+
+    /**
+     * Setup
+     *
+     * @param  array $aRevisions
+     * @param  array $aMerge
+     *
+     * @return Mergy_Action_Merge_Revisions
+     */
+    public function setup(array $aRevisions, stdClass $oConfig) {
+        $this->_aRevisions = $aRevisions;
+        foreach ($oConfig->merge as $sMerge) {
+            $sDecide = str_replace('Revisions', 'Decision', get_class($this)) . '_' . ucfirst(strtolower($sMerge));
+            if (class_exists($sDecide) === true) {
+                $this->register(new $sDecide($oConfig));
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Run the decission-queue over all revisions
+     *
+     * @return Mergy_Action_Merge_Revisions
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    public function process() {
+        $aRevisions = array();
+        foreach ($this->_aRevisions as $oRevision) {
+            foreach ($this->_aQueue as $oDecider) {
+                if ($oDecider->decide($oRevision) === true) {
+                    $aRevisions[] = $oRevision;
+                    break;
+                }
+            }
+        }
+
+        $this->_aRevisions = $aRevisions;
+        return $this;
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * Add a Decider to the queue
+     *
+     * @param  Mergy_Action_Merge_AbstractDecision $oDecider
+     *
+     * @return Mergy_Action_Merge_Revisions
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    public function register(Mergy_Action_Merge_AbstractDecision $oDecider) {
+        $this->_aQueue[get_class($oDecider)] = $oDecider;
+        return $this;
+    }
+
+    /**
+     * Get the Revisions to merge
+     *
+     * @return array
+     */
+    public function get() {
+        return $this->process()->_aRevisions;
     }
 }

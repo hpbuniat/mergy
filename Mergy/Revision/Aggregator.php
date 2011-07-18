@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Mediator to read revision-information
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,59 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Revision_Aggregator {
 
     /**
-     * Test Command-Setting via construct
+     * Passed cli-arguments
+     *
+     * @var array
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_aArguments = array();
+
+    /**
+     * The Services to use
+     *
+     * @var array <>
+     */
+    protected $_aRevisions = array();
+
+    /**
+     * Set some properties
+     *
+     * @param  array $aArguments
+     *
+     * @return Mergy_Revision_Aggregator
+     */
+    public function set(array $aArguments) {
+        $this->_aArguments = $aArguments;
+        return $this;
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Get all Revision-Details
+     *
+     * @return Mergy_Revision_Aggregator
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    public function run() {
+        foreach ($this->_aArguments['revisions'] as $sRevision) {
+            $this->_aRevisions[] = new Mergy_Revision($this->_aArguments['config']->remote, $sRevision);
+        }
+
+        $oParallel = new Mergy_Util_Parallel($this->_aRevisions);
+        $this->_aRevisions = $oParallel->run(array(
+            'read',
+            'diff'
+        ))->get();
+
+        return $this;
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * Get the revisions
+     *
+     * @return array
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    public function get() {
+        return $this->_aRevisions;
     }
 }

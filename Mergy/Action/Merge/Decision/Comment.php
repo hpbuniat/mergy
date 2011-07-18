@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Decide whether to merge a revision, depending on commit-message
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,21 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_Action_Merge_Decision_Comment extends Mergy_Action_Merge_AbstractDecision {
 
     /**
-     * Test Command-Setting via construct
+     * (non-PHPdoc)
+     * @see Mergy_Action_Merge_Decision_Interface::decide()
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
+    public function decide(Mergy_Revision $oRevision) {
+        if (isset($this->_oConfig->force) and is_array($this->_oConfig->force) === true) {
+            foreach ($this->_oConfig->force as $sComment) {
+                if (stripos($oRevision->sInfo, $sComment) !== false) {
+                    return true;
+                }
+            }
+        }
 
-    /**
-     * Test Command-Setting via command-method
-     */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
-
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+        return false;
     }
 }

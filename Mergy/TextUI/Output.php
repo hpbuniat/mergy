@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Simple Output-Wrapper
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,42 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+class Mergy_TextUI_Output {
 
     /**
-     * Test Command-Setting via construct
+     * Print an Error
+     *
+     * @param  string $message
+     * @param  boolean $exit
+     *
+     * @return void
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    static public function error($message, $exit = true) {
+        print_r('Error: ' . $message . PHP_EOL);
+        if ($exit === true) {
+            exit(Mergy_TextUI_Command::ERROR_EXIT);
+        }
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Print an Info
+     *
+     * @param  string $message
+     *
+     * @return void
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    static public function info($message) {
+        print_r($message . PHP_EOL);
     }
 
     /**
-     * Test Command-Setting via execute-method
+     * Write to ouput
+     *
+     * @param  string $message
+     *
+     * @return void
      */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
+    static public function write($message) {
+        print_r($message);
     }
 }

@@ -41,7 +41,7 @@
  */
 
 /**
- * Test Command-Execution
+ * Abstract for merge-decision
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,38 +49,30 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_CommandTest extends PHPUnit_Framework_TestCase {
+abstract class Mergy_Action_Merge_AbstractDecision {
 
     /**
-     * Test Command-Setting via construct
+     * The Config
+     *
+     * @var stdClass
      */
-    public function testCommandConstruct() {
-        $o = new Mergy_Util_Command('dir');
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
+    protected $_oConfig;
+
+    /**
+     * Init a Decision-Object
+     *
+     * @param  stdClass $oConfig
+     */
+    public function __construct(stdClass $oConfig) {
+        $this->_oConfig = $oConfig;
     }
 
     /**
-     * Test Command-Setting via command-method
+     * Decide weather to merge a revision or not
+     *
+     * @param  Mergy_Revision $oRevision
+     *
+     * @return boolean
      */
-    public function testCommandCommand() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->command('dir'));
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute());
-        $this->asserttrue($o->isSuccess());
-        $this->assertContains('mergy.php', $o->get());
-        $this->assertEquals(0, $o->status());
-    }
-
-    /**
-     * Test Command-Setting via execute-method
-     */
-    public function testCommandFailure() {
-        $o = new Mergy_Util_Command();
-        $this->assertInstanceOf('Mergy_Util_Command', $o->execute('notExisting'));
-        $this->assertfalse($o->isSuccess());
-        $this->assertEquals(127, $o->status());
-    }
+    abstract public function decide(Mergy_Revision $oRevision);
 }
