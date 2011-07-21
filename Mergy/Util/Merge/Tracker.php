@@ -127,7 +127,7 @@ class Mergy_Util_Merge_Tracker {
      * @return Mergy_Util_Merge_Tracker
      */
     protected function _write() {
-        file_get_contents($this->_sFile, serialize($this->_aTickets));
+        file_put_contents($this->_sFile, serialize($this->_aTickets));
         return $this;
     }
 }
