@@ -53,7 +53,7 @@ class Mergy_Action_Merge_Decision_Revision extends Mergy_Action_Merge_AbstractDe
 
     /**
      * (non-PHPdoc)
-     * @see Mergy_Action_Merge_Decision_Interface::decide()
+     * @see Mergy_Action_Merge_AbstractDecision::decide()
      */
     public function decide(Mergy_Revision $oRevision) {
         if (isset($this->_oConfig->revisions) and is_array($this->_oConfig->revisions) === true and in_array($oRevision->iRevision, $this->_oConfig->revisions)) {

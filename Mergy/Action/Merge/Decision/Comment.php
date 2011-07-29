@@ -53,7 +53,7 @@ class Mergy_Action_Merge_Decision_Comment extends Mergy_Action_Merge_AbstractDec
 
     /**
      * (non-PHPdoc)
-     * @see Mergy_Action_Merge_Decision_Interface::decide()
+     * @see Mergy_Action_Merge_AbstractDecision::decide()
      */
     public function decide(Mergy_Revision $oRevision) {
         if (isset($this->_oConfig->force) and is_array($this->_oConfig->force) === true) {
