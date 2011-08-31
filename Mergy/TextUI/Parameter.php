@@ -68,7 +68,7 @@ class Mergy_TextUI_Parameter {
         'list' => false,
         'diff' => false,
         'all' => false,
-        'strict' => false,
+        'strict' => true,
         'more' => false,
         'remote' => ''
     );
@@ -136,7 +136,11 @@ class Mergy_TextUI_Parameter {
                     break;
 
                 case '--force':
-                    self::$_aArguments['force-comment'] = $option[1];
+                    self::$_aArguments['strict'] = false;
+                    if (empty($option) !== true) {
+                        self::$_aArguments['force-comment'] = $option[1];
+                    }
+
                     break;
 
                 case '--strict':

@@ -80,6 +80,20 @@ class Mergy_TextUI_Command {
     const CONFIG_ERROR = 'Error while reading the configuration!';
 
     /**
+     * Message to indicate a finished run
+     *
+     * @var string
+     */
+    const FINISHED = 'All jobs done';
+
+    /**
+     * The applications name
+     *
+     * @var string
+     */
+    const NAME = 'mergy';
+
+    /**
      * Default-Arguments
      *
      * @var array
@@ -131,8 +145,13 @@ class Mergy_TextUI_Command {
     public function run(array $argv, $exit = true) {
         $this->_handleArguments($argv);
 
+        $oNotifier = new Mergy_Notifier($this->_aArguments['config']);
+        Mergy_Util_Registry::set('notify', $oNotifier);
+
         $oAggregator = new Mergy_Revision_Aggregator();
         $aRevisions = $oAggregator->set($this->_aArguments)->run()->get();
+        unset($oAggregator);
+
         if ($this->_aArguments['list'] === true) {
             foreach ($aRevisions as $oRevision) {
                 if ($oRevision instanceof Mergy_Revision) {
@@ -140,27 +159,32 @@ class Mergy_TextUI_Command {
                 }
             }
         }
+        else {
+            if ($this->_aArguments['all'] !== true) {
+                $oRevisions = new Mergy_Action_Merge_Revisions();
+                $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
+                unset($oRevisions);
+            }
 
-        if ($this->_aArguments['list'] !== true and $this->_aArguments['all'] !== true) {
-            $oRevisions = new Mergy_Action_Merge_Revisions();
-            $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
+            $this->_aArguments['config']->mergeRevisions = $aRevisions;
+
+            $oAction = new Mergy_Action($this->_aArguments['config']);
+            $oAction->setup();
+
+            if ($this->_aArguments['diff'] === true) {
+                $oAction->command('Diff');
+            }
+            else {
+                $oAction->pre()->merge()->post();
+            }
+
+            unset($oAction);
+            if ($this->_aArguments['config']->more !== true) {
+                $this->_oMergeTracker->clean();
+            }
         }
 
-        $this->_aArguments['config']->mergeRevisions = $aRevisions;
-
-        $oAction = new Mergy_Action($this->_aArguments['config']);
-        $oAction->setup();
-        if ($this->_aArguments['diff'] === true) {
-            $oAction->command('Diff');
-        }
-
-        if ($this->_aArguments['list'] !== true and $this->_aArguments['diff'] !== true) {
-            $oAction->pre()->merge()->post();
-        }
-
-        if ($this->_aArguments['config']->more !== true) {
-            $this->_oMergeTracker->clean();
-        }
+        $oNotifier->notify(Mergy_AbstractNotifier::INFO, self::FINISHED);
 
         return $this;
     }
@@ -278,6 +302,6 @@ EOT;
      * @return void
      */
     public static function printVersionString() {
-        Mergy_TextUI_Output::info('mergy - a svn cherry-pick-assisant (Version: @package_version@)');
+        Mergy_TextUI_Output::info('mergy - a svn cherry-pick-assistant (Version: @package_version@)');
     }
 }

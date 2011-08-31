@@ -56,7 +56,7 @@ class Mergy_Action_Merge_Decision_Ticket extends Mergy_Action_Merge_AbstractDeci
      * @see Mergy_Action_Merge_AbstractDecision::decide()
      */
     public function decide(Mergy_Revision $oRevision) {
-        if (isset($this->_oConfig->tickets) and is_array($this->_oConfig->tickets) === true) {
+        if (isset($this->_oConfig->tickets) === true and is_array($this->_oConfig->tickets) === true) {
 
             $aMatches = array();
             preg_match('/id=(\d+)|(bug|ticket)\s?(\d+)/i', $oRevision->sInfo, $aMatches);

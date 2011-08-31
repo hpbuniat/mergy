@@ -34,14 +34,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package mergy
+ * @package Testy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 /**
- * Log Merge-Actions, to track params and create a commit message
+ * Notifier-Abstract
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,89 +49,52 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_Merge_Tracker {
+abstract class Mergy_AbstractNotifier {
 
     /**
-     * Cache-File to track the data
+     * Message for successful-tests
      *
      * @var string
      */
-    protected $_sFile;
+    const SUCCESS = 'Success';
 
     /**
-     * Merged tickets
+     * Message for failed-tests
      *
-     * @var array
+     * @var string
      */
-    protected $_aTickets = array();
+    const FAILED = 'Failed';
 
     /**
-     * The Configuration
+     * Message for Infos
+     *
+     * @var string
+     */
+    const INFO = 'Info';
+
+    /**
+     * The notifiers configuration
      *
      * @var stdClass
      */
     protected $_oConfig;
 
     /**
-     * Create a new tracker
+     * Init a Notifier
      *
-     * @param stdClass $oConfig
+     * @param  stdClass $oConfig
      */
-    public function __construct(stdClass $oConfig) {
+    public function __construct(stdClass $oConfig = null) {
         $this->_oConfig = $oConfig;
-        $this->_sFile = Mergy_Util_Cacheable::DIR . md5($this->_oConfig->remote);
-        if (is_dir(Mergy_Util_Cacheable::DIR) !== true) {
-            mkdir(Mergy_Util_Cacheable::DIR);
-        }
-
-        $this->_read();
-        $this->_aTickets = array_merge($this->_aTickets, $this->_oConfig->tickets);
-        $this->_write();
     }
 
     /**
-     * Get the data
+     * Execute the notification
      *
-     * @return array
-     */
-    public function get() {
-        return $this->_aTickets;
-    }
-
-    /**
-     * Remove saved data
+     * @param  string $sStatus
+     * @param  string $sText
      *
-     * @return Mergy_Util_Merge_Tracker
+     * @return Mergy_AbstractNotifier
      */
-    public function clean() {
-        $this->_aTickets = $this->_oConfig->tickets;
-        if (file_exists($this->_sFile) === true) {
-            unlink($this->_sFile);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Read saved data
-     *
-     * @return Mergy_Util_Merge_Tracker
-     */
-    protected function _read() {
-        if (file_exists($this->_sFile) === true) {
-            $this->_aTickets = unserialize(file_get_contents($this->_sFile));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Write the data
-     *
-     * @return Mergy_Util_Merge_Tracker
-     */
-    protected function _write() {
-        file_put_contents($this->_sFile, serialize($this->_aTickets));
-        return $this;
-    }
+    abstract public function notify($sStatus, $sText);
 }

@@ -105,7 +105,7 @@ class Mergy_Util_Diff_Renderer {
      */
     public function __construct() {
         $this->_oHtml = new DOMDocument('1.0');
-        $this->_oHtml->loadHTMLFile(MERGY_PATH . DIRECTORY_SEPARATOR . 'mergy' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'diff.html');
+        $this->_oHtml->loadHTMLFile(MERGY_PATH . 'Mergy' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'diff.html');
         $this->_oDiffDiv = $this->_oHtml->getElementById('diffs');
     }
 
@@ -138,7 +138,9 @@ class Mergy_Util_Diff_Renderer {
             }
         }
 
-        $this->_oHtml->saveHTMLFile(getcwd() . DIRECTORY_SEPARATOR . 'Mergy_diff_' . time() . '.html');
+        $sFile = getcwd() . DIRECTORY_SEPARATOR . 'Mergy_diff_' . time() . '.html';
+        $this->_oHtml->saveHTMLFile($sFile);
+        Mergy_Util_Registry::get('notify')->notify(Mergy_AbstractNotifier::INFO, $sFile);
 
         return $this;
     }
