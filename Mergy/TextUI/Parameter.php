@@ -124,6 +124,10 @@ class Mergy_TextUI_Parameter {
         if (self::$_aOptions instanceof PEAR_Error) {
             Mergy_TextUI_Output::error(self::$_aOptions->getMessage());
         }
+        elseif (empty(self::$_aOptions[0]) === true) {
+            self::$_aArguments['list'] = true;
+            self::$_aArguments['continue'] = true;
+        }
 
         foreach (self::$_aOptions[0] as $option) {
             switch ($option[0]) {

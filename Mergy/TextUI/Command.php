@@ -153,11 +153,7 @@ class Mergy_TextUI_Command {
         unset($oAggregator);
 
         if ($this->_aArguments['list'] === true) {
-            foreach ($aRevisions as $oRevision) {
-                if ($oRevision instanceof Mergy_Revision) {
-                    Mergy_TextUI_Output::info($oRevision->__toString());
-                }
-            }
+            Mergy_TextUI_Output::printRevisions($aRevisions);
         }
         else {
             if ($this->_aArguments['all'] !== true) {
@@ -211,7 +207,10 @@ class Mergy_TextUI_Command {
             $sConfig = $this->_aArguments['config'];
         }
 
-        $this->_aArguments['config'] = json_decode(file_get_contents($sConfig));
+        if (file_exists($sConfig) === true) {
+            $this->_aArguments['config'] = json_decode(file_get_contents($sConfig));
+        }
+
         if (empty($this->_aArguments['config']) === true) {
             Mergy_TextUI_Output::error(self::CONFIG_ERROR);
             exit();
