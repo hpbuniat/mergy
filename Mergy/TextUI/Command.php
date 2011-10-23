@@ -278,6 +278,6 @@ EOT;
      * @return void
      */
     public static function printVersionString() {
-        Mergy_TextUI_Output::info('mergy - a svn cherry-pick-assisant (Version: @package_version@)');
+        Mergy_TextUI_Output::info('mergy - a svn cherry-pick-assistant (Version: @package_version@)');
     }
 }
