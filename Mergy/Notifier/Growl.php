@@ -99,11 +99,13 @@ class Mergy_Notifier_Growl extends Mergy_AbstractNotifier {
      * @return Mergy_AbstractNotifier
      */
     private function _send() {
-        $this->_sMessage .= pack('H32', md5($this->_sMessage . $this->_oConfig->password));
+        if ($this->_oConfig instanceof stdClass) {
+            $this->_sMessage .= pack('H32', md5($this->_sMessage . $this->_oConfig->password));
 
-        $rSocket = fsockopen('udp://' . $this->_oConfig->host, $this->_oConfig->port);
-        fwrite($rSocket, $this->_sMessage);
-        fclose($rSocket);
+            $rSocket = fsockopen('udp://' . $this->_oConfig->host, $this->_oConfig->port);
+            fwrite($rSocket, $this->_sMessage);
+            fclose($rSocket);
+        }
 
         return $this;
     }
