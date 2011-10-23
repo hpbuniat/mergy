@@ -23,5 +23,22 @@
         }
     },
     "force": "!merge",
-    "merge": ["ticket", "comment", "revision"]
+    "merge": ["ticket", "comment", "revision"],
+    "notifiers": {
+        "growl": {
+            "host": "127.0.0.1",
+            "port": "9887",
+            "password": "",
+            "enabled": true
+        },
+        "dbus": {
+            "enabled": false
+        },
+        "stdout": {
+            "enabled": true
+        },
+        "libnotify": {
+            "enabled": true
+        }
+    }
 }

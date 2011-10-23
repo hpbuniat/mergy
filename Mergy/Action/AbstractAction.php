@@ -175,7 +175,8 @@ abstract class Mergy_Action_AbstractAction {
      */
     protected function _confirm($sMessage = '', array $aExpected = array()) {
         $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
-        Mergy_TextUI_Output::info(sprintf($sMessage, $this->getName()));
+        Mergy_Util_Registry::get('notify')->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
+        Mergy_TextUI_Output::info('waiting ...');
         do {
             $rInput = fopen('php://stdin', 'r');
             $sInput = trim(fgets($rInput));

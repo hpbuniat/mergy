@@ -68,7 +68,7 @@ class Mergy_TextUI_Parameter {
         'list' => false,
         'diff' => false,
         'all' => false,
-        'strict' => false,
+        'strict' => true,
         'more' => false,
         'remote' => ''
     );
@@ -124,6 +124,10 @@ class Mergy_TextUI_Parameter {
         if (self::$_aOptions instanceof PEAR_Error) {
             Mergy_TextUI_Output::error(self::$_aOptions->getMessage());
         }
+        elseif (empty(self::$_aOptions[0]) === true) {
+            self::$_aArguments['list'] = true;
+            self::$_aArguments['continue'] = true;
+        }
 
         foreach (self::$_aOptions[0] as $option) {
             switch ($option[0]) {
@@ -136,7 +140,11 @@ class Mergy_TextUI_Parameter {
                     break;
 
                 case '--force':
-                    self::$_aArguments['force-comment'] = $option[1];
+                    self::$_aArguments['strict'] = false;
+                    if (empty($option) !== true) {
+                        self::$_aArguments['force-comment'] = $option[1];
+                    }
+
                     break;
 
                 case '--strict':

@@ -34,14 +34,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package mergy
+ * @package Testy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 /**
- * Log Merge-Actions, to track params and create a commit message
+ * Notify via libnotify
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,89 +49,32 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_Merge_Tracker {
+class Mergy_Notifier_Libnotify extends Mergy_AbstractNotifier {
 
     /**
-     * Cache-File to track the data
-     *
-     * @var string
-     */
-    protected $_sFile;
-
-    /**
-     * Merged tickets
+     * The icons to use with libnotify
      *
      * @var array
+     *
+     * @see http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html
      */
-    protected $_aTickets = array();
+    protected $_aIcons = array(
+        Mergy_AbstractNotifier::SUCCESS => 'face-smile',
+        Mergy_AbstractNotifier::FAILED => 'face-sad',
+        Mergy_AbstractNotifier::INFO => 'face-angel'
+    );
 
     /**
-     * The Configuration
-     *
-     * @var stdClass
+     * (non-PHPdoc)
+     * @see Mergy_AbstractNotifier::notify()
      */
-    protected $_oConfig;
+    public function notify($sStatus, $sText) {
+        $sExecute = sprintf('notify-send --icon=%s \'%s\'', $this->_aIcons[$sStatus], $sText);
 
-    /**
-     * Create a new tracker
-     *
-     * @param stdClass $oConfig
-     */
-    public function __construct(stdClass $oConfig) {
-        $this->_oConfig = $oConfig;
-        $this->_sFile = Mergy_Util_Cacheable::DIR . md5($this->_oConfig->remote);
-        if (is_dir(Mergy_Util_Cacheable::DIR) !== true) {
-            mkdir(Mergy_Util_Cacheable::DIR);
-        }
+        $oCommand = new Mergy_Util_Command();
+        $oCommand->execute($sExecute);
+        unset($oCommand, $sExecute);
 
-        $this->_read();
-        $this->_aTickets = array_merge($this->_aTickets, $this->_oConfig->tickets);
-        $this->_write();
-    }
-
-    /**
-     * Get the data
-     *
-     * @return array
-     */
-    public function get() {
-        return $this->_aTickets;
-    }
-
-    /**
-     * Remove saved data
-     *
-     * @return Mergy_Util_Merge_Tracker
-     */
-    public function clean() {
-        $this->_aTickets = $this->_oConfig->tickets;
-        if (file_exists($this->_sFile) === true) {
-            unlink($this->_sFile);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Read saved data
-     *
-     * @return Mergy_Util_Merge_Tracker
-     */
-    protected function _read() {
-        if (file_exists($this->_sFile) === true) {
-            $this->_aTickets = unserialize(file_get_contents($this->_sFile));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Write the data
-     *
-     * @return Mergy_Util_Merge_Tracker
-     */
-    protected function _write() {
-        file_put_contents($this->_sFile, serialize($this->_aTickets));
         return $this;
     }
 }

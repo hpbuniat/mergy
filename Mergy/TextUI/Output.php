@@ -87,4 +87,29 @@ class Mergy_TextUI_Output {
     static public function write($message) {
         print_r($message);
     }
+
+    /**
+     * Print a list of revisions
+     *
+     * @param  array $aRevisions
+     *
+     * @return void
+     */
+    static public function printRevisions(array $aRevisions) {
+        $bBackground = true;
+        foreach ($aRevisions as $oRevision) {
+            if ($oRevision instanceof Mergy_Revision) {
+                $sPrint = $oRevision->__toString();
+                if ($bBackground === true) {
+                    $bBackground = false;
+                    $sPrint = "\033[0;30m\033[47m" . $sPrint . "\033[0m";
+                }
+                else {
+                    $bBackground = true;
+                }
+
+                Mergy_TextUI_Output::info($sPrint);
+            }
+        }
+    }
 }

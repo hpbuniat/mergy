@@ -25,7 +25,7 @@ mergy [--remote=[repository|branch]]     // remote repository, might be only a b
       [--diff]                           // create a diff, based on the revisions to merge
       [--all]                            // use all unmerged revisions
       [--diff-all]                       // equals --diff --all
-      [--strict]                         // only merge, what was given - no force via config
+      [--strict]                         // only merge, what was given - no force via config, this is the default
       [--commit]                         // commit changes in the wc - with tracked log, if present
       [--more]                           // skip commit
 
@@ -42,7 +42,7 @@ mergy --list
 
 // merge all revisions of ticket #1000 and include revision 523, as it does not contain a proper commit-message
 // also ignore all force-comments
-mergy --ticket=1000 --rev=523 --strict
+mergy --ticket=1000 --rev=523 --strict --more
 
 // mergy will can now create a diff of everything, was is going to be merged. 
 // After reviewing the diff and merging, a phpunit run should verify the merge-result.
