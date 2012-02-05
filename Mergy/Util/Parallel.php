@@ -100,7 +100,13 @@ class Mergy_Util_Parallel {
      */
     public function __construct(array $aStack = array()) {
         $this->_iStart = microtime(true);
-        $this->_aStack = $aStack;
+        $this->_aStack = array();
+
+        // convert stack to array with numeric keys
+        foreach ($aStack as $oObject) {
+            $this->_aStack[] = $oObject;
+        }
+        
         if (is_dir(Mergy_Util_Cacheable::DIR) !== true) {
             mkdir(Mergy_Util_Cacheable::DIR, 0744, true);
         }
@@ -175,12 +181,21 @@ class Mergy_Util_Parallel {
      * @return ParallelTests
      */
     private function _execute($aMethods, $iStack) {
-        foreach ($aMethods as $sMethod) {
-            $this->_aStack[$iStack]->$sMethod();
+        foreach ($aMethods as $mKey => $mValue) {
+            $aParams = array();
+            $sFunc = $mValue;
+            if (is_numeric($mKey) !== true) {
+                $sFunc = $mKey;
+                $aParams = $mValue;
+            }
+
+            call_user_func_array(array(
+                $this->_aStack[$iStack],
+                $sFunc
+            ), $aParams);
         }
 
-        $bPut = shm_put_var($this->_rShared, $iStack, gzcompress(serialize($this->_aStack[$iStack])));
-
+        shm_put_var($this->_rShared, $iStack, gzcompress(serialize($this->_aStack[$iStack])));
         posix_kill(getmypid(), 9);
         return $this;
     }
@@ -199,7 +214,7 @@ class Mergy_Util_Parallel {
             $iPid = pcntl_waitpid(-1, $iStatus, WNOHANG);
             $bUnset = false;
             foreach ($this->_aProc as $sChild => $iChild) {
-                if ($iChild == $iPid) {
+                if ($iChild === $iPid) {
                     unset($this->_aProc[$sChild]);
                     $bUnset = true;
                 }
