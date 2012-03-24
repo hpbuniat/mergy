@@ -74,13 +74,15 @@ class Mergy_TextUI_Output_Group extends Mergy_TextUI_OutputAbstract {
         ksort($aTickets);
         foreach ($aTickets as $sTicket => $aRevisions) {
             $sTicket = ($sTicket === 0) ? 'unspecified' : $sTicket;
-            $this->_sOutput .= "\033[0;30m\033[47mTicket: " . $sTicket  . "\033[0m" . PHP_EOL;
-            $aRevisionNumbers = array();
+            $aAuthors = $aRevisionNumbers = array();
             foreach ($aRevisions as $oRevision) {
                 $aRevisionNumbers[] = $oRevision->iRevision;
+                $aAuthors[] = $oRevision->sAuthor;
             }
 
+            $aAuthors = array_unique($aAuthors);
             sort($aRevisionNumbers);
+            $this->_sOutput .= sprintf("\033[0;30m\033[47mTicket: %s (%s)\033[0m", $sTicket, implode(',', $aAuthors)) . PHP_EOL;
             $this->_sOutput .= "\t" . implode(',', $aRevisionNumbers) . PHP_EOL;
         }
 

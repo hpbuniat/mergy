@@ -207,10 +207,12 @@ class Mergy_TextUI_Parameter {
                     break;
 
                 case '--help':
+                    $oMergy::showHelp();
+                    throw new Mergy_TextUI_Parameter_Exception(Mergy_TextUI_Parameter_Exception::NO_PARSING);
+
                 case '--version':
-                    $oMergy->showHelp();
-                    exit($oMergy::SUCCESS_EXIT);
-                    break;
+                    $oMergy::printVersionString();
+                    throw new Mergy_TextUI_Parameter_Exception(Mergy_TextUI_Parameter_Exception::NO_PARSING);
             }
         }
 

@@ -34,14 +34,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package mergy
+ * @package Mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 /**
- * Build an action-object
+ * Notify to a file
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,58 +49,17 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Action_Builder {
+class Mergy_Notifier_File extends Mergy_AbstractNotifier {
 
     /**
-     * The Action-Handler
-     *
-     * @var Mergy_Action_Handler
+     * (non-PHPdoc)
+     * @see Mergy_AbstractNotifier::notify()
      */
-    protected $_oHandler;
-
-    /**
-     * The notifier wrapper
-     *
-     * @var Mergy_Notifier
-     */
-    protected $_oNotifier;
-
-    /**
-     * Mergy-Config
-     *
-     * @var stdClass
-     */
-    protected $_oConfig;
-
-    /**
-     * Create the Action-Builder
-     *
-     * @param Mergy_Action_Handler $oHandler
-     * @param stdClass $oConfig
-     * @param Mergy_Notifier $oNotifier
-     */
-    public function __construct(Mergy_Action_Handler $oHandler, stdClass $oConfig, Mergy_Notifier $oNotifier) {
-        $this->_oHandler = $oHandler;
-        $this->_oConfig = $oConfig;
-        $this->_oNotifier = $oNotifier;
-    }
-
-    /**
-     * Build a Action and add it to the handler
-     *
-     * @param  string $sType
-     * @param  stdClass $oConfig
-     * @param  string $sStep
-     *
-     * @return Mergy_Action_Builder
-     */
-    public function build($sType, stdClass $oConfig, $sStep = null) {
-        $sType = ucfirst(strtolower((isset($oConfig->type) === true) ? $oConfig->type : $sType));
-        $sClass = str_replace('Builder', 'Concrete', get_class($this)) . '_' . $sType;
-        if (class_exists($sClass) === true) {
-            $oAction = new $sClass($this->_oConfig, $oConfig, $this->_oNotifier);
-            $this->_oHandler->add($oAction, strtolower($sStep));
-        }
+    public function notify($sStatus, $sText) {
+        $sFile = rtrim($this->_oConfig->path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . Mergy_TextUI_Command::NAME . '.log';
+        $sContent = Mergy_TextUI_Output::info($sStatus . PHP_EOL . $sText . PHP_EOL, true);
+        touch($sFile);
+        file_put_contents($sFile, $sContent, FILE_APPEND);
 
         return $this;
     }

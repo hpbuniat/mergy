@@ -8,14 +8,14 @@ class Mergy_Notifier_StdoutTest extends PHPUnit_Framework_TestCase {
     /**
      * @var Mergy_Notifier_Stdout
      */
-    protected $object;
+    protected $_object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new Mergy_Notifier_Stdout();
+        $this->_object = new Mergy_Notifier_Stdout();
     }
 
     /**
@@ -30,6 +30,6 @@ class Mergy_Notifier_StdoutTest extends PHPUnit_Framework_TestCase {
      */
     public function testNotify() {
         $this->expectOutputRegex('/Test/');
-        $this->assertInstanceOf('Mergy_AbstractNotifier', $this->object->notify(Mergy_AbstractNotifier::SUCCESS, 'Test'));
+        $this->assertInstanceOf('Mergy_AbstractNotifier', $this->_object->notify(Mergy_AbstractNotifier::SUCCESS, 'Test'));
     }
 }

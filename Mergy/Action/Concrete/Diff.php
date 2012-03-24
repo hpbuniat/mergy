@@ -64,7 +64,7 @@ class Mergy_Action_Concrete_Diff extends Mergy_Action_AbstractAction {
      */
     protected function _execute() {
         $oDiff = new Mergy_Util_Diff_Renderer();
-        $oDiff->revisions($this->_oConfig->mergeRevisions)->render();
+        $oDiff->revisions($this->_oConfig->mergeRevisions)->render($this->_oNotifier);
         unset($oDiff);
 
         return $this;

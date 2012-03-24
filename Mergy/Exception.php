@@ -1,6 +1,6 @@
 <?php
 /**
- * testy
+ * mergy
  *
  * Copyright (c)2011-2012, Hans-Peter Buniat <hpbuniat@googlemail.com>.
  * All rights reserved.

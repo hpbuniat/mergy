@@ -73,6 +73,13 @@ abstract class Mergy_Action_AbstractAction {
     protected $_oCommand;
 
     /**
+     * The notifier wrapper
+     *
+     * @var Mergy_Notifier
+     */
+    protected $_oNotifier;
+
+    /**
      * Was the action executed successful ?
      *
      * @var boolean
@@ -91,10 +98,12 @@ abstract class Mergy_Action_AbstractAction {
      *
      * @param stdClass $oConfig
      * @param stdClass $oProperties
+     * @param Mergy_Notifier $oNotifier
      */
-    public function __construct(stdClass $oConfig, stdClass $oProperties) {
+    public function __construct(stdClass $oConfig, stdClass $oProperties, Mergy_Notifier $oNotifier) {
         $this->_oConfig = $oConfig;
         $this->_oProperties = $oProperties;
+        $this->_oNotifier = $oNotifier;
 
         $this->_oCommand = new Mergy_Util_Command();
     }
@@ -175,7 +184,7 @@ abstract class Mergy_Action_AbstractAction {
      */
     protected function _confirm($sMessage = '', array $aExpected = array()) {
         $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
-        Mergy_Util_Registry::get('notify')->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
+        $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
         Mergy_TextUI_Output::info('waiting ...');
         do {
             $rInput = fopen('php://stdin', 'r');

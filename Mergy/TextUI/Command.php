@@ -94,6 +94,42 @@ class Mergy_TextUI_Command {
     const NAME = 'mergy';
 
     /**
+     * The version
+     *
+     * @var string
+     */
+    const VERSION = 'mergy - a svn cherry-pick-assistant (Version: @package_version@)';
+
+    /**
+     * Usage info
+     *
+     * @var string
+     */
+    const USAGE = <<<'EOT'
+Usage: mergy [switches]
+      [--remote=[repository|branch]]     // remote repository, might be only a branch-name
+      [--rev=revision[,revision]]        // revisions to merge (might have been merged before)
+      [--ticket=ticket-id[,ticket-id]]   // find all revisions of a ticket
+      [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
+      [--reintegrate]                    // reintegrate a whole branch - without specific revisions
+      [--list]                           // list unmerged revisions from repository
+      [--list-group]                     // list unmerged revisions from repository and group by comment
+      [--diff]                           // create a diff, based on the revisions to merge
+      [--all]                            // use all unmerged revisions
+      [--diff-all]                       // equals --diff --all
+      [--strict]                         // only merge, what was given - no force via config
+      [--commit]                         // commit changes in the wc - with tracked log, if present
+      [--more]                           // skip commit
+
+      // further parameters
+      [--verbose]                        // verbose
+      [--force=keyword[,keyword]]        // keywords to force merge of this revisons, if unmerged
+      [--config=mergy.json]              // use this config-file
+      [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
+
+EOT;
+
+    /**
      * Default-Arguments
      *
      * @var array
@@ -123,6 +159,13 @@ class Mergy_TextUI_Command {
     protected $_oMergeTracker = null;
 
     /**
+     * The notifier-wrapper
+     *
+     * @var Mergy_Notifier
+     */
+    protected $_oNotifier;
+
+    /**
      * Main entry
      *
      * @param boolean $exit
@@ -143,46 +186,54 @@ class Mergy_TextUI_Command {
      * @TODO Cleanup !
      */
     public function run(array $argv, $exit = true) {
-        $this->_handleArguments($argv);
-
-        $oNotifier = new Mergy_Notifier($this->_aArguments['config']);
-        Mergy_Util_Registry::set('notify', $oNotifier);
-
-        $oAggregator = new Mergy_Revision_Aggregator();
-        $aRevisions = $oAggregator->set($this->_aArguments)->run()->get();
-        unset($oAggregator);
-
-        if ($this->_aArguments['list'] === true) {
-            $sPrinter = 'Mergy_TextUI_Output_' . (($this->_aArguments['group'] === true) ? 'Group' : 'List');
-            $oPrinter = new $sPrinter();
-            Mergy_TextUI_Output::info($oPrinter->setRevisions($aRevisions)->get());
-        }
-        else {
-            if ($this->_aArguments['all'] !== true) {
-                $oRevisions = new Mergy_Action_Merge_foRevisions();
-                $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
-                unset($oRevisions);
+        try {
+            if ($this->handleArguments($argv) === false) {
+                exit(self::SUCCESS_EXIT);
             }
 
-            $this->_aArguments['config']->mergeRevisions = $aRevisions;
+            $oAggregator = new Mergy_Revision_Aggregator();
+            $oAggregator->set($this->_aArguments);
 
-            $oAction = new Mergy_Action($this->_aArguments['config']);
-            $oAction->setup();
+            if ($this->_aArguments['list'] === true) {
+                $aRevisions =  $oAggregator->run($oAggregator::SKIP_DIFF)->get();
 
-            if ($this->_aArguments['diff'] === true) {
-                $oAction->command('Diff');
+                $sPrinter = 'Mergy_TextUI_Output_' . (($this->_aArguments['group'] === true) ? 'Group' : 'List');
+                $oPrinter = new $sPrinter();
+                Mergy_TextUI_Output::info($oPrinter->setRevisions($aRevisions)->get());
             }
             else {
-                $oAction->pre()->merge()->post();
+                $aRevisions =  $oAggregator->run()->get();
+
+                if ($this->_aArguments['all'] !== true) {
+                    $oRevisions = new Mergy_Action_Merge_Revisions();
+                    $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
+                    unset($oRevisions);
+                }
+
+                $this->_aArguments['config']->mergeRevisions = $aRevisions;
+
+                $oAction = new Mergy_Action($this->_aArguments['config'], $this->_oNotifier);
+                $oAction->setup();
+
+                if ($this->_aArguments['diff'] === true) {
+                    $oAction->command('Diff');
+                }
+                else {
+                    $oAction->pre()->merge()->post();
+                }
+
+                unset($oAction);
+                if ($this->_aArguments['config']->more !== true) {
+                    $this->_oMergeTracker->clean();
+                }
             }
 
-            unset($oAction);
-            if ($this->_aArguments['config']->more !== true) {
-                $this->_oMergeTracker->clean();
-            }
+            $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, self::FINISHED);
+            unset($oAggregator, $this->_oNotifier);
         }
-
-        $oNotifier->notify(Mergy_AbstractNotifier::INFO, self::FINISHED);
+        catch (RuntimeException $e) {
+            Mergy_TextUI_Output::error($e->getMessage());
+        }
 
         return $this;
     }
@@ -196,10 +247,14 @@ class Mergy_TextUI_Command {
      *
      * @TODO Cleanup!
      */
-    protected function _handleArguments(array $argv) {
-        self::printVersionString();
+    public function handleArguments(array $argv = array()) {
+        try {
+            $this->_aArguments = Mergy_TextUI_Parameter::parse($argv, $this);
+        }
+        catch (Mergy_TextUI_Parameter_Exception $oException) {
+            return false;
+        }
 
-        $this->_aArguments = Mergy_TextUI_Parameter::parse($argv, $this);
         if (defined('VERBOSE') === false) {
             define('VERBOSE', $this->_aArguments['verbose']);
         }
@@ -242,9 +297,10 @@ class Mergy_TextUI_Command {
             $this->_aArguments['config']->force = false;
         }
 
-
+        $this->_oNotifier = new Mergy_Notifier($this->_aArguments['config']);
         $this->_oMergeTracker = new Mergy_Util_Merge_Tracker($this->_aArguments['config']);
-        $oAction = new Mergy_Action($this->_aArguments['config']);
+
+        $oAction = new Mergy_Action($this->_aArguments['config'], $this->_oNotifier);
         if ($this->_aArguments['config']->continue !== true) {
             $oAction->setup()->init();
             $this->_oMergeTracker->clean();
@@ -262,7 +318,6 @@ class Mergy_TextUI_Command {
         sort($aTrackedTickets);
         $this->_aArguments['config']->tracked = $aTrackedTickets;
 
-        Mergy_Util_Registry::set('_CONFIG', $this->_aArguments['config']);
         unset($oAction);
 
         return $this;
@@ -273,30 +328,8 @@ class Mergy_TextUI_Command {
      *
      * @return void
      */
-    public function showHelp() {
-        echo <<<EOT
-Usage: mergy [switches]
-      [--remote=[repository|branch]]     // remote repository, might be only a branch-name
-      [--rev=revision[,revision]]        // revisions to merge (might have been merged before)
-      [--ticket=ticket-id[,ticket-id]]   // find all revisions of a ticket
-      [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
-      [--reintegrate]                    // reintegrate a whole branch - without specific revisions
-      [--list]                           // list unmerged revisions from repository
-      [--list-group]                     // list unmerged revisions from repository and group by comment
-      [--diff]                           // create a diff, based on the revisions to merge
-      [--all]                            // use all unmerged revisions
-      [--diff-all]                       // equals --diff --all
-      [--strict]                         // only merge, what was given - no force via config
-      [--commit]                         // commit changes in the wc - with tracked log, if present
-      [--more]                           // skip commit
-
-      // further parameters
-      [--verbose]                        // verbose
-      [--force=keyword[,keyword]]        // keywords to force merge of this revisons, if unmerged
-      [--config=mergy.json]              // use this config-file
-      [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
-
-EOT;
+    public static function showHelp() {
+        Mergy_TextUI_Output::info(self::USAGE);
     }
 
     /**
@@ -305,6 +338,6 @@ EOT;
      * @return void
      */
     public static function printVersionString() {
-        Mergy_TextUI_Output::info('mergy - a svn cherry-pick-assistant (Version: @package_version@)');
+        Mergy_TextUI_Output::info(self::VERSION);
     }
 }

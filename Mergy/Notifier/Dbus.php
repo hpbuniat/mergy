@@ -49,6 +49,8 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
+
+// @codeCoverageIgnoreStart
 class Mergy_Notifier_Dbus extends Mergy_AbstractNotifier {
 
     /**
@@ -89,3 +91,4 @@ class Mergy_Notifier_Dbus extends Mergy_AbstractNotifier {
         return $this;
     }
 }
+// @codeCoverageIgnoreEnd

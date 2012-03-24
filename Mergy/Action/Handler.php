@@ -66,6 +66,13 @@ class Mergy_Action_Handler {
     protected $_aReturn = array();
 
     /**
+     * The globale configuration
+     *
+     * @var stdClass
+     */
+    protected $_oConfig;
+
+    /**
      * Const for unique-actions
      *
      * @var string
@@ -75,8 +82,9 @@ class Mergy_Action_Handler {
     /**
      * Init the handler
      */
-    public function __construct() {
+    public function __construct(stdClass $oConfig) {
         $this->reset();
+        $this->_oConfig = $oConfig;
     }
 
     /**
@@ -167,10 +175,9 @@ class Mergy_Action_Handler {
      * @return Mergy_Action_Handler
      */
     public function merge(array $aRevisions) {
-        $oConfig = Mergy_Util_Registry::get('_CONFIG');
         foreach ($aRevisions as $oRevision) {
-            $oMerge = new Mergy_Action_Concrete_Merge($oConfig, new stdClass());
-            if ($oConfig->reintegrate === true) {
+            $oMerge = new Mergy_Action_Concrete_Merge($this->_oConfig, new stdClass());
+            if ($this->_oConfig->reintegrate === true) {
                 $oMerge->reintegrate();
             }
             else {

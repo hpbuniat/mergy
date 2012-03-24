@@ -69,7 +69,7 @@ class Mergy_Notifier_Libnotify extends Mergy_AbstractNotifier {
      * @see Mergy_AbstractNotifier::notify()
      */
     public function notify($sStatus, $sText) {
-        $sExecute = sprintf('notify-send --icon=%s \'%s\'', $this->_aIcons[$sStatus], addslashes($sText));
+        $sExecute = sprintf('notify-send --icon=%s \'%s\' \'%s\'', $this->_aIcons[$sStatus], Mergy_TextUI_Command::NAME, addslashes($this->formatMessage($sText)));
 
         $oCommand = new Mergy_Util_Command();
         $oCommand->execute($sExecute);

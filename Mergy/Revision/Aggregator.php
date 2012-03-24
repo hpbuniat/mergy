@@ -52,6 +52,20 @@
 class Mergy_Revision_Aggregator {
 
     /**
+     * Create a diff
+     *
+     * @var boolean
+     */
+    const CREATE_DIFF = true;
+
+    /**
+     * Do not create a diff
+     *
+     * @var boolean
+     */
+    const SKIP_DIFF = true;
+
+    /**
      * Passed cli-arguments
      *
      * @var array
@@ -80,19 +94,24 @@ class Mergy_Revision_Aggregator {
     /**
      * Get all Revision-Details
      *
+     * @param  boolean $bCreateDiff [true]
+     *
      * @return Mergy_Revision_Aggregator
      */
-    public function run() {
+    public function run($bCreateDiff = true) {
         foreach ($this->_aArguments['revisions'] as $sRevision) {
             $this->_aRevisions[] = new Mergy_Revision($this->_aArguments['config']->remote, $sRevision);
         }
 
+        $aActions = array('read');
+        if ($bCreateDiff === true) {
+            $aActions[] = 'diff';
+        }
+
         $sTransport = isset($this->_aArguments['config']->parallel) ? $this->_aArguments['config']->parallel : Mergy_Util_Parallel_Transport_Builder::TRANSPORT_DEFAULT;
         $oParallel = new Mergy_Util_Parallel_Execute($this->_aRevisions, Mergy_Util_Parallel_Transport_Builder::build($sTransport));
-        $this->_aRevisions = $oParallel->run(array(
-            'read',
-            'diff'
-        ))->get();
+        $this->_aRevisions = $oParallel->run($aActions)->get();
+        unset($oParallel);
 
         return $this;
     }

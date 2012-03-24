@@ -73,6 +73,13 @@ class Mergy_Action {
     protected $_oConfig;
 
     /**
+     * The notifier wrapper
+     *
+     * @var Mergy_Notifier
+     */
+    protected $_oNotifier;
+
+    /**
      * Step-Order
      *
      * @var array
@@ -95,10 +102,12 @@ class Mergy_Action {
      * Create the action-mediator
      *
      * @param  stdclass $oConfig
+     * @param  Mergy_Notifier $oNotifier
      */
-    public function __construct(stdclass $oConfig) {
-        $this->_oActionHandler = new Mergy_Action_Handler();
+    public function __construct(stdclass $oConfig, Mergy_Notifier $oNotifier) {
+        $this->_oActionHandler = new Mergy_Action_Handler($oConfig);
         $this->_oConfig = $oConfig;
+        $this->_oNotifier = $oNotifier;
         if (isset($oConfig->mergeRevisions) === true) {
             $this->_aRevisions = $oConfig->mergeRevisions;
         }
@@ -112,7 +121,7 @@ class Mergy_Action {
      * @return string
      */
     public function command($sCommand) {
-        $oActionBuilder = new Mergy_Action_Builder($this->_oActionHandler, $this->_oConfig);
+        $oActionBuilder = new Mergy_Action_Builder($this->_oActionHandler, $this->_oConfig, $this->_oNotifier);
         $oActionBuilder->build($sCommand, new stdClass());
 
         $sReturn = $this->_oActionHandler->{Mergy_Action_Handler::SINGLE}()->get($sCommand);
@@ -128,7 +137,7 @@ class Mergy_Action {
      * @return Mergy_Action
      */
     public function setup() {
-        $oActionBuilder = new Mergy_Action_Builder($this->_oActionHandler, $this->_oConfig);
+        $oActionBuilder = new Mergy_Action_Builder($this->_oActionHandler, $this->_oConfig, $this->_oNotifier);
         foreach ($this->_aSteps as $sStep) {
             if (isset($this->_oConfig->$sStep) and $this->_oConfig->$sStep instanceof stdClass) {
                 foreach ($this->_oConfig->$sStep as $sType => $oEntry) {

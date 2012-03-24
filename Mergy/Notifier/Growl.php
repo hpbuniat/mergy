@@ -49,6 +49,8 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
+
+// @codeCoverageIgnoreStart
 class Mergy_Notifier_Growl extends Mergy_AbstractNotifier {
 
     /**
@@ -66,6 +68,13 @@ class Mergy_Notifier_Growl extends Mergy_AbstractNotifier {
     protected $_bRegistered = false;
 
     /**
+     * Maximum message length
+     *
+     * @var int
+     */
+    protected $_iMessageLength = 256;
+
+    /**
      * (non-PHPdoc)
      * @see Mergy_AbstractNotifier::notify()
      */
@@ -76,8 +85,8 @@ class Mergy_Notifier_Growl extends Mergy_AbstractNotifier {
             $this->_sMessage = pack('c2nc2', 1, 0, strlen($sName), 3, 3)
                              . $sName
                              . pack('n', strlen(self::SUCCESS)) . self::SUCCESS
-                             . pack('n', strlen(self::FAILED)) . self::FAILED
                              . pack('n', strlen(self::INFO)) . self::INFO
+                             . pack('n', strlen(self::FAILED)) . self::FAILED
                              . pack('c', 0)
                              . pack('c', 1)
                              . pack('c', 2);
@@ -86,11 +95,14 @@ class Mergy_Notifier_Growl extends Mergy_AbstractNotifier {
             $this->_bRegistered = true;
         }
 
-        $this->_sMessage = pack('c2n5', 1, 1, 0, strlen($sStatus), strlen($sText), strlen($sName))
+        $sText = $sStatus . PHP_EOL . PHP_EOL . trim($sText);
+        $sText = $this->formatMessage($sText);
+
+        $this->_sMessage = pack('c2n4', 1, 1, 0, strlen($sStatus), strlen($sText), strlen($sName))
                          . $sStatus . $sText . $sName;
         $this->_send();
 
-        return $this;;
+        return $this;
     }
 
     /**
@@ -110,3 +122,4 @@ class Mergy_Notifier_Growl extends Mergy_AbstractNotifier {
         return $this;
     }
 }
+// @codeCoverageIgnoreEnd

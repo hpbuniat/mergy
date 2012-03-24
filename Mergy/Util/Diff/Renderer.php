@@ -124,9 +124,11 @@ class Mergy_Util_Diff_Renderer {
     /**
      * Start rendering
      *
+     * @param  Mergy_Notifier $oNotifier
+     *
      * @return Mergy_Util_Diff_Creator
      */
-    public function render() {
+    public function render(Mergy_Notifier $oNotifier) {
         foreach ($this->_aRevisions as $oRevision) {
             $aDiffs = $oRevision->aDiffs;
             $this->_iCount = count($aDiffs);
@@ -140,7 +142,7 @@ class Mergy_Util_Diff_Renderer {
 
         $sFile = getcwd() . DIRECTORY_SEPARATOR . 'Mergy_diff_' . time() . '.html';
         $this->_oHtml->saveHTMLFile($sFile);
-        Mergy_Util_Registry::get('notify')->notify(Mergy_AbstractNotifier::INFO, $sFile);
+        $oNotifier->notify(Mergy_AbstractNotifier::INFO, $sFile);
 
         return $this;
     }
