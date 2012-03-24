@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Parse Command-Line arguments
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
@@ -66,6 +66,7 @@ class Mergy_TextUI_Parameter {
     protected static $_aArguments = array(
         'verbose' => false,
         'list' => false,
+        'group' => false,
         'diff' => false,
         'all' => false,
         'strict' => true,
@@ -98,6 +99,7 @@ class Mergy_TextUI_Parameter {
         'help' => null,
         'verbose' => null,
         'list' => null,
+        'list-group' => null,
         'diff' => null,
         'all' => null,
         'diff-all' => null,
@@ -185,6 +187,10 @@ class Mergy_TextUI_Parameter {
 
                 case '--list':
                     self::$_aArguments['list'] = true;
+                    break;
+                case '--list-group':
+                    self::$_aArguments['list'] = true;
+                    self::$_aArguments['group'] = true;
                     break;
 
                 case '--diff':

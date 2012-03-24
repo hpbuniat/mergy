@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Represents a revision
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
@@ -117,7 +117,9 @@ class Mergy_Revision {
      * @return Mergy_Revision
      */
     public function read() {
-        return $this->_fetchFiles()->_fetchInfo();
+        $this->_fetchFiles()->_fetchInfo();
+
+        return $this;
     }
 
     /**
@@ -177,11 +179,11 @@ class Mergy_Revision {
         $oFiles = simplexml_load_string($oCache->get());
         if ($oFiles instanceof SimpleXMLElement) {
             foreach ($oFiles->paths->children() as $oPath) {
-                $aAttributes = $oPath->attributes();
+                $oAttributes = $oPath->attributes();
                 $sPath = (string) $oPath;
-                if (strlen($sPath) > 0 and isset($aAttributes->kind) === true and (string) $aAttributes->kind === 'file') {
+                if (strlen($sPath) > 0 and isset($oAttributes->kind) === true and (string) $oAttributes->kind === 'file') {
                     $this->aFiles[] = array(
-                        'type' => (string) $aAttributes->item,
+                        'type' => (string) $oAttributes->item,
                         'path' => (string) $sPath
                     );
                 }

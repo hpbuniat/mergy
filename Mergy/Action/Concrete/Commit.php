@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Action to commit
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy

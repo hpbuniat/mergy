@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Decide whether to merge a revision, depending on a ticket-number in the commit message
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
@@ -57,22 +57,30 @@ class Mergy_Action_Merge_Decision_Ticket extends Mergy_Action_Merge_AbstractDeci
      */
     public function decide(Mergy_Revision $oRevision) {
         if (isset($this->_oConfig->tickets) === true and is_array($this->_oConfig->tickets) === true) {
-
-            $aMatches = array();
-            preg_match('/id=(\d+)|(bug|ticket)\s?(\d+)/i', $oRevision->sInfo, $aMatches);
-            $sId = false;
-            if (empty($aMatches[1]) !== true) {
-                $sId = $aMatches[1];
-            }
-            elseif (empty($aMatches[3]) !== true) {
-                $sId = $aMatches[3];
-            }
-
+            $sId = self::parseTicket($oRevision);
             if ($sId !== false and in_array($sId, $this->_oConfig->tickets) === true) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Parse the ticket number of a revison-comment
+     *
+     * @param  Mergy_Revision $oRevision
+     *
+     * @return mixed <int | false>
+     */
+    public static function parseTicket(Mergy_Revision $oRevision) {
+        $aMatches = array();
+        preg_match('/(id|bug|ticket)(=|\s)?(\d+)/i', $oRevision->sInfo, $aMatches);
+        $sId = false;
+        if (empty($aMatches[3]) !== true) {
+            $sId = $aMatches[3];
+        }
+
+        return $sId;
     }
 }

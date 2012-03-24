@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Simple Output-Wrapper
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
@@ -78,7 +78,7 @@ class Mergy_TextUI_Output {
     }
 
     /**
-     * Write to ouput
+     * Write to output
      *
      * @param  string $message
      *
@@ -86,30 +86,5 @@ class Mergy_TextUI_Output {
      */
     static public function write($message) {
         print_r($message);
-    }
-
-    /**
-     * Print a list of revisions
-     *
-     * @param  array $aRevisions
-     *
-     * @return void
-     */
-    static public function printRevisions(array $aRevisions) {
-        $bBackground = true;
-        foreach ($aRevisions as $oRevision) {
-            if ($oRevision instanceof Mergy_Revision) {
-                $sPrint = $oRevision->__toString();
-                if ($bBackground === true) {
-                    $bBackground = false;
-                    $sPrint = "\033[0;30m\033[47m" . $sPrint . "\033[0m";
-                }
-                else {
-                    $bBackground = true;
-                }
-
-                Mergy_TextUI_Output::info($sPrint);
-            }
-        }
     }
 }

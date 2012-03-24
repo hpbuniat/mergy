@@ -1,6 +1,9 @@
 mergy - a svn cherry-pick-assistant 
+=====
 
-Idea:
+Idea
+-----
+
 The inspiration came from John Resig's pulley (http://ejohn.org/blog/pulley/)
 
 mergy can assist in feature-branch driven development. 
@@ -16,12 +19,15 @@ them into your stable trunk - mergy can do a lot of repeating tasks for you:
 - execute pre- and post-merge actions (e.g. phpunit)
 
 Usage:
+-----
+
 mergy [--remote=[repository|branch]]     // remote repository, might be only a branch-name
       [--rev=revision[,revision]]        // revisions to merge (might have been merged before)
       [--ticket=ticket-id[,ticket-id]]   // find all revisions of a ticket
       [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
       [--reintegrate]                    // reintegrate a whole branch - without specific revisions
       [--list]                           // list unmerged revisions from repository
+      [--list-group]                     // list unmerged revisions from repository
       [--diff]                           // create a diff, based on the revisions to merge
       [--all]                            // use all unmerged revisions
       [--diff-all]                       // equals --diff --all
@@ -39,6 +45,9 @@ Use case:
 
 // get a quick overview about which revisions of your remote are currently unmerged
 mergy --list
+
+// get a quick overview about which revisions of your remote are currently unmerged and group them by ticket
+mergy --list-group
 
 // merge all revisions of ticket #1000 and include revision 523, as it does not contain a proper commit-message
 // also ignore all force-comments

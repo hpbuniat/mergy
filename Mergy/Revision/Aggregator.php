@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Mediator to read revision-information
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
@@ -87,7 +87,8 @@ class Mergy_Revision_Aggregator {
             $this->_aRevisions[] = new Mergy_Revision($this->_aArguments['config']->remote, $sRevision);
         }
 
-        $oParallel = new Mergy_Util_Parallel($this->_aRevisions);
+        $sTransport = isset($this->_aArguments['config']->parallel) ? $this->_aArguments['config']->parallel : Mergy_Util_Parallel_Transport_Builder::TRANSPORT_DEFAULT;
+        $oParallel = new Mergy_Util_Parallel_Execute($this->_aRevisions, Mergy_Util_Parallel_Transport_Builder::build($sTransport));
         $this->_aRevisions = $oParallel->run(array(
             'read',
             'diff'

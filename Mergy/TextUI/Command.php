@@ -36,7 +36,7 @@
  *
  * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
@@ -44,7 +44,7 @@
  * Base-Command class to handle arguments and start processing
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
- * @copyright2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
@@ -153,11 +153,13 @@ class Mergy_TextUI_Command {
         unset($oAggregator);
 
         if ($this->_aArguments['list'] === true) {
-            Mergy_TextUI_Output::printRevisions($aRevisions);
+            $sPrinter = 'Mergy_TextUI_Output_' . (($this->_aArguments['group'] === true) ? 'Group' : 'List');
+            $oPrinter = new $sPrinter();
+            Mergy_TextUI_Output::info($oPrinter->setRevisions($aRevisions)->get());
         }
         else {
             if ($this->_aArguments['all'] !== true) {
-                $oRevisions = new Mergy_Action_Merge_Revisions();
+                $oRevisions = new Mergy_Action_Merge_foRevisions();
                 $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
                 unset($oRevisions);
             }
@@ -280,6 +282,7 @@ Usage: mergy [switches]
       [--continue]                       // continue skips the pre-merge-actions (e.g. after conflict)
       [--reintegrate]                    // reintegrate a whole branch - without specific revisions
       [--list]                           // list unmerged revisions from repository
+      [--list-group]                     // list unmerged revisions from repository and group by comment
       [--diff]                           // create a diff, based on the revisions to merge
       [--all]                            // use all unmerged revisions
       [--diff-all]                       // equals --diff --all
@@ -292,6 +295,7 @@ Usage: mergy [switches]
       [--force=keyword[,keyword]]        // keywords to force merge of this revisons, if unmerged
       [--config=mergy.json]              // use this config-file
       [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
+
 EOT;
     }
 
