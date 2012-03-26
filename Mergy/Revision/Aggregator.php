@@ -80,6 +80,22 @@ class Mergy_Revision_Aggregator {
     protected $_aRevisions = array();
 
     /**
+     * The revision-builder to create a revision with all detail-aggregators
+     *
+     * @var Mergy_Revision_Builder
+     */
+    protected $_oBuilder;
+
+    /**
+     * Create the aggregator
+     *
+     * @param  Mergy_Revision_Builder $oBuilder
+     */
+    public function __construct(Mergy_Revision_Builder $oBuilder) {
+        $this->_oBuilder = $oBuilder;
+    }
+
+    /**
      * Set some properties
      *
      * @param  array $aArguments
@@ -100,7 +116,7 @@ class Mergy_Revision_Aggregator {
      */
     public function run($bCreateDiff = true) {
         foreach ($this->_aArguments['revisions'] as $sRevision) {
-            $this->_aRevisions[] = new Mergy_Revision($this->_aArguments['config']->remote, $sRevision);
+            $this->_aRevisions[] = $this->_oBuilder->build($this->_aArguments['config']->remote, $sRevision);
         }
 
         $aActions = array('read');

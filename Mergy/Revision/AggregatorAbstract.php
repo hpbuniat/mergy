@@ -34,90 +34,99 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package Mergy
+ * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 /**
- * Parallel-Transport for File
+ * Base class for cacheable Revision-Data
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
- * @link https://github.com/hpbuniat/Mergy
+ * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_Parallel_Transport_File implements Mergy_Util_Parallel_TransportInterface {
+abstract class Mergy_Revision_AggregatorAbstract extends Mergy_Util_Cacheable {
 
     /**
-     * The directory to use
+     * The repository of the revision
      *
      * @var string
      */
-    private $_sDir = '/dev/null';
+    protected $_sRepository;
 
     /**
-     * The file-prefix
+     * The revisions number
+     *
+     * @var int
+     */
+    protected $_iRevision;
+
+    /**
+     * Concrete file Path
      *
      * @var string
      */
-    const PREFIX = '_parallel_';
+    protected $_sPath;
 
     /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::setup()
+     * Concrete file action type
+     *
+     * @var string
      */
-    public function setup(array $aOptions = array()) {
-        if (empty($aOptions['dir']) !== true and is_dir($aOptions['dir']) === true) {
-            $sUniqueId = uniqid(self::PREFIX);
-            $this->_sDir = $aOptions['dir'] . $sUniqueId;
-            mkdir($this->_sDir, 0744, true);
+    protected $_sType;
 
-            return $this;
-        }
+    /**
+     * The command executor
+     *
+     * @var Mergy_Util_Command
+     */
+    protected $_oCommand;
 
-        throw new Mergy_Util_Parallel_Transport_Exception(Mergy_Util_Parallel_Transport_Exception::SETUP_ERROR);
+    /**
+     * Error string
+     *
+     * @var string
+     */
+    const ERROR = 'Error reading: %s';
+
+    /**
+     * Init the Revision reader
+     *
+     * @param  string $sRepository
+     * @param  int $iRevision
+     * @param  string $sPath
+     * @param  string $sType
+     */
+    public function __construct($sRepository, $iRevision, $sPath = null, $sType = null) {
+        $this->_iRevision = $iRevision;
+        $this->_sRepository = $sRepository;
+        $this->_sPath = $sPath;
+        $this->_sType = strtolower(trim((string) $sType));
+        $this->_id();
     }
 
     /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::read()
+     * Set the command-executor
+     *
+     * @param  Mergy_Util_Command $oCommand
+     *
+     * @return Mergy_Revision_RevisionAbstract
      */
-    public function read($sId) {
-        $mReturn = false;
-        $sFile = $this->_sDir . DIRECTORY_SEPARATOR . self::PREFIX . $sId;
-        if (file_exists($sFile) === true) {
-            $mReturn = file_get_contents($sFile);
-        }
-
-        return $mReturn;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::write()
-     */
-    public function write($sId, $mData) {
-        $sFile = $this->_sDir . DIRECTORY_SEPARATOR . self::PREFIX . $sId;
-        file_put_contents($sFile, $mData);
-
+    public function setCommand(Mergy_Util_Command $oCommand) {
+        $this->_oCommand = $oCommand;
         return $this;
     }
 
     /**
      * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::free()
+     * @see Mergy_Util_Cacheable::_id()
      */
-    public function free() {
-        $oIter = new DirectoryIterator($this->_sDir);
-        foreach ($oIter as $oFile) {
-            if ($oFile->isFile() === true) {
-                unlink($oFile->getPathname());
-            }
-        }
-
-        return $this;
+    protected function _id() {
+        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . $this->_sType . get_class($this));
+        return $this->_file();
     }
 }

@@ -41,7 +41,7 @@
  */
 
 /**
- * Read the information of a revision
+ * Class for creating a revision
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,23 +49,78 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Revision_Info extends Mergy_Revision_SvnAbstract {
+class Mergy_Revision_Builder {
 
     /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Cacheable::_get()
+     * The Subversion-VCS
+     *
+     * @var string
      */
-    protected function _get() {
-        $sCommand = 'svn log ' . $this->_sRepository . ' --xml -v -r ' . $this->_iRevision;
-        $oCommand = new Mergy_Util_Command($sCommand);
-        $oCommand->execute();
+    const SUBVERSION = 'Subversion';
 
-        $this->_mCache = $oCommand->get();
-        if ($oCommand->isSuccess() !== true) {
-            $this->_mCache = '';
-            Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
-        }
+    /**
+     * Aggregator for differences of a revision
+     *
+     * @var string
+     */
+    const AGGREGATE_DIFF = 'Diff';
 
-        return $this;
+    /**
+     * Aggregator for modified/added/etc files
+     *
+     * @var string
+     */
+    const AGGREGATE_FILES = 'Files';
+
+    /**
+     * Aggregator for revision details (author, comment, date)
+     *
+     * @var string
+     */
+    const AGGREGATE_INFO = 'Info';
+
+
+    /**
+     * The vcs of the project
+     *
+     * @var string
+     */
+    protected $_sVersionControl = '';
+
+    /**
+     * Create the builder with a specific vcs
+     *
+     * @param  string $sVersionControl
+     */
+    public function __construct($sVersionControl) {
+        $this->_sVersionControl = $sVersionControl;
+    }
+
+    /**
+     * Create a revision
+     *
+     * @param  string $sRepository
+     * @param  string $sRevision
+     *
+     * @return Mergy_Revsion
+     */
+    public function build($sRepository, $iRevision) {
+        return new Mergy_Revision($sRepository, $iRevision, $this);
+    }
+
+    /**
+     * Get a detail aggregator
+     *
+     * @param  string $sAggregator
+     * @param  array $aParameter
+     *
+     * @return Mergy_Revision_AggregatorAbstract
+     */
+    public function getAggregator($sAggregator, array $aParameter) {
+        $sClass = 'Mergy_Revision_' . $this->_sVersionControl . '_' . $sAggregator;
+
+        $oReflection = new ReflectionClass($sClass);
+        $oAggregator = $oReflection->newInstanceArgs($aParameter);
+        return $oAggregator->setCommand(new Mergy_Util_Command());
     }
 }

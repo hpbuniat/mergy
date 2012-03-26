@@ -40,6 +40,13 @@
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
+if (defined('MERGY_PATH') !== true) {
+    define('MERGY_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+    if (strpos('@php_bin@', '@php_bin') === 0) {
+        set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+    }
+}
+
 // lightweight autoloader
 function Mergy_autoload($sClass) {
     $sFile = str_replace('_', DIRECTORY_SEPARATOR, $sClass) . '.php';

@@ -34,90 +34,51 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package Mergy
+ * @package mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 /**
- * Parallel-Transport for File
+ * Read the information of a revision
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  * @version Release: @package_version@
- * @link https://github.com/hpbuniat/Mergy
+ * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Util_Parallel_Transport_File implements Mergy_Util_Parallel_TransportInterface {
-
-    /**
-     * The directory to use
-     *
-     * @var string
-     */
-    private $_sDir = '/dev/null';
-
-    /**
-     * The file-prefix
-     *
-     * @var string
-     */
-    const PREFIX = '_parallel_';
+class Mergy_Revision_Subversion_Info extends Mergy_Revision_AggregatorAbstract {
 
     /**
      * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::setup()
+     * @see Mergy_Util_Cacheable::_get()
      */
-    public function setup(array $aOptions = array()) {
-        if (empty($aOptions['dir']) !== true and is_dir($aOptions['dir']) === true) {
-            $sUniqueId = uniqid(self::PREFIX);
-            $this->_sDir = $aOptions['dir'] . $sUniqueId;
-            mkdir($this->_sDir, 0744, true);
+    protected function _get() {
+        $sCommand = 'svn log ' . $this->_sRepository . ' --xml -v -r ' . $this->_iRevision;
+        $this->_oCommand->command($sCommand)->execute();
 
-            return $this;
-        }
-
-        throw new Mergy_Util_Parallel_Transport_Exception(Mergy_Util_Parallel_Transport_Exception::SETUP_ERROR);
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::read()
-     */
-    public function read($sId) {
-        $mReturn = false;
-        $sFile = $this->_sDir . DIRECTORY_SEPARATOR . self::PREFIX . $sId;
-        if (file_exists($sFile) === true) {
-            $mReturn = file_get_contents($sFile);
-        }
-
-        return $mReturn;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::write()
-     */
-    public function write($sId, $mData) {
-        $sFile = $this->_sDir . DIRECTORY_SEPARATOR . self::PREFIX . $sId;
-        file_put_contents($sFile, $mData);
-
-        return $this;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Parallel_TransportInterface::free()
-     */
-    public function free() {
-        $oIter = new DirectoryIterator($this->_sDir);
-        foreach ($oIter as $oFile) {
-            if ($oFile->isFile() === true) {
-                unlink($oFile->getPathname());
-            }
+        $this->_mCache = $this->_oCommand->get();
+        if ($this->_oCommand->isSuccess() !== true) {
+            $this->_mCache = '';
+            Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
         }
 
         return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see Mergy_Util_Cacheable::get()
+     */
+    public function get() {
+        parent::get();
+        $oInfo = simplexml_load_string($this->_mCache);
+        if ($oInfo instanceof SimpleXMLElement) {
+            return $oInfo->logentry;
+        }
+
+        throw new Mergy_Revision_Aggregator_Exception(Mergy_Revision_Aggregator_Exception::ERROR);
     }
 }

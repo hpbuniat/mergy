@@ -41,7 +41,7 @@
  */
 
 /**
- * Get diff of a modification
+ * Read modifications of a revision from a repository
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,42 +49,50 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Revision_Diff extends Mergy_Revision_SvnAbstract {
+class Mergy_Revision_Subversion_Files extends Mergy_Revision_AggregatorAbstract {
 
     /**
      * (non-PHPdoc)
      * @see Mergy_Util_Cacheable::_get()
      */
     protected function _get() {
-        $bDiff = true;
-        switch ($this->_sType) {
-            case 'deleted':
-                $bDiff = false;
-                break;
+        $sCommand = 'svn diff ' . $this->_sRepository . ' --xml --summarize -c ' . $this->_iRevision;
+        $this->_oCommand->command($sCommand)->execute();
 
-            case 'added':
-                $sSwitch = '@' . $this->_iRevision;
-                $sCommand = 'cat';
-                break;
-
-            default:
-                $sSwitch = '@' . $this->_iRevision . ' -c ' . $this->_iRevision;
-                $sCommand = 'diff';
-                break;
-        }
-
-        if ($bDiff === true) {
-            $sCommand = 'svn ' . $sCommand . ' "' . $this->_sPath . '"' . $sSwitch;
-            $oCommand = new Mergy_Util_Command($sCommand);
-            $oCommand->execute();
-
-            $this->_mCache = $oCommand->get();
-            if ($oCommand->isSuccess() !== true) {
-                $this->_mCache = '';
-                Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
-            }
+        $this->_mCache = $this->_oCommand->get();
+        if ($this->_oCommand->isSuccess() !== true) {
+            $this->_mCache = '';
+            Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
         }
 
         return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see Mergy_Util_Cacheable::get()
+     */
+    public function get() {
+        parent::get();
+        $oFiles = simplexml_load_string($this->_mCache);
+        if ($oFiles instanceof SimpleXMLElement) {
+            $aFiles = array();
+            foreach ($oFiles->paths->children() as $oPath) {
+                $oAttributes = $oPath->attributes();
+                $sPath = (string) $oPath;
+                if (strlen($sPath) > 0 and isset($oAttributes->kind) === true and (string) $oAttributes->kind === 'file') {
+                    $aFiles[] = array(
+                        'type' => (string) $oAttributes->item,
+                        'path' => (string) $sPath
+                    );
+                }
+
+                unset ($sPath, $oAttributes);
+            }
+
+            return $aFiles;
+        }
+
+        throw new Mergy_Revision_Aggregator_Exception(Mergy_Revision_Aggregator_Exception::ERROR);
     }
 }

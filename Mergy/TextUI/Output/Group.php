@@ -62,7 +62,7 @@ class Mergy_TextUI_Output_Group extends Mergy_TextUI_OutputAbstract {
         $aTickets = array();
         foreach ($this->_aRevisions as $oRevision) {
             if ($oRevision instanceof Mergy_Revision) {
-                $sTicket = (int) Mergy_Action_Merge_Decision_Ticket::parseTicket($oRevision);
+                $sTicket = (int) Mergy_Action_Merge_Decision_Ticket::parseTicket($oRevision->sInfo);
                 if (empty($aTickets[$sTicket]) === true) {
                     $aTickets[$sTicket] = array();
                 }

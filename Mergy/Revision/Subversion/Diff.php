@@ -41,7 +41,7 @@
  */
 
 /**
- * Read modifications of a revision from a repository
+ * Get diff of a modification
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,21 +49,39 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_Revision_Files extends Mergy_Revision_SvnAbstract {
+class Mergy_Revision_Subversion_Diff extends Mergy_Revision_AggregatorAbstract {
 
     /**
      * (non-PHPdoc)
      * @see Mergy_Util_Cacheable::_get()
      */
     protected function _get() {
-        $sCommand = 'svn diff ' . $this->_sRepository . ' --xml --summarize -c ' . $this->_iRevision;
-        $oCommand = new Mergy_Util_Command($sCommand);
-        $oCommand->execute();
+        $bDiff = true;
+        switch ($this->_sType) {
+            case 'deleted':
+                $bDiff = false;
+                break;
 
-        $this->_mCache = $oCommand->get();
-        if ($oCommand->isSuccess() !== true) {
-            $this->_mCache = '';
-            Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
+            case 'added':
+                $sSwitch = '@' . $this->_iRevision;
+                $sCommand = 'cat';
+                break;
+
+            default:
+                $sSwitch = '@' . $this->_iRevision . ' -c ' . $this->_iRevision;
+                $sCommand = 'diff';
+                break;
+        }
+
+        if ($bDiff === true) {
+            $sCommand = 'svn ' . $sCommand . ' "' . $this->_sPath . '"' . $sSwitch;
+            $this->_oCommand->command($sCommand)->execute();
+
+            $this->_mCache = $this->_oCommand->get();
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_mCache = '';
+                Mergy_TextUI_Output::info(sprintf(self::ERROR, $sCommand));
+            }
         }
 
         return $this;

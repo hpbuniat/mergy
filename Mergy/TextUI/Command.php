@@ -167,31 +167,31 @@ EOT;
 
     /**
      * Main entry
-     *
-     * @param boolean $exit
      */
-    public static function main($exit = true) {
-        $command = new Mergy_TextUI_Command();
-        $command->run($_SERVER['argv'], $exit);
+    public static function main() {
+        $oCommand = new Mergy_TextUI_Command();
+        $oCommand->run($_SERVER['argv']);
     }
 
     /**
      * Run mergy
      *
      * @param  array   $argv
-     * @param  boolean $exit
      *
-     * @return Mergy_TextUI_Command
+     * @return voud
      *
      * @TODO Cleanup !
      */
-    public function run(array $argv, $exit = true) {
+    public function run(array $argv) {
         try {
             if ($this->handleArguments($argv) === false) {
-                exit(self::SUCCESS_EXIT);
+                return self::SUCCESS_EXIT;
             }
 
-            $oAggregator = new Mergy_Revision_Aggregator();
+            $sVersionControl = (isset($this->_aArguments['config']->vcs) === true) ? $this->_aArguments['config']->vcs : Mergy_Revision_Builder::SUBVERSION;
+            $oBuilder = new Mergy_Revision_Builder($sVersionControl);
+
+            $oAggregator = new Mergy_Revision_Aggregator($oBuilder);
             $oAggregator->set($this->_aArguments);
 
             if ($this->_aArguments['list'] === true) {
@@ -234,8 +234,6 @@ EOT;
         catch (RuntimeException $e) {
             Mergy_TextUI_Output::error($e->getMessage());
         }
-
-        return $this;
     }
 
     /**
@@ -270,7 +268,7 @@ EOT;
 
         if (empty($this->_aArguments['config']) === true) {
             Mergy_TextUI_Output::error(self::CONFIG_ERROR);
-            exit();
+            return false;
         }
 
         if (empty($this->_aArguments['remote']) !== true and preg_match('!http(s)?://!i', $this->_aArguments['remote']) === 0) {
@@ -291,8 +289,8 @@ EOT;
             }
         }
 
-        $this->_aArguments['config']->tickets = explode(",", $this->_aArguments['config']->tickets);
-        $this->_aArguments['config']->force = explode(",", $this->_aArguments['config']->force);
+        $this->_aArguments['config']->tickets = explode(',', $this->_aArguments['config']->tickets);
+        $this->_aArguments['config']->force = explode(',', $this->_aArguments['config']->force);
         if ($this->_aArguments['strict'] === true) {
             $this->_aArguments['config']->force = false;
         }
@@ -311,7 +309,7 @@ EOT;
         }
         catch (Exception $oException) {
             Mergy_TextUI_Output::error($oException->getMessage());
-            exit(self::ERROR_EXIT);
+            return false;
         }
 
         $aTrackedTickets = $this->_oMergeTracker->get();

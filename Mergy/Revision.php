@@ -101,14 +101,23 @@ class Mergy_Revision {
     public $aDiffs = array();
 
     /**
+     * The revision builder
+     *
+     * @var Mergy_Revision_Builder
+     */
+    protected $_oBuilder;
+
+    /**
      * Create a Revision-Object
      *
      * @param  string $sRepository
      * @param  int $iRevision
+     * @param  Mergy_Revision_Builder $oBuilder
      */
-    public function __construct($sRepository, $iRevision) {
+    public function __construct($sRepository, $iRevision, Mergy_Revision_Builder $oBuilder) {
         $this->iRevision = $iRevision;
         $this->sRepository = $sRepository;
+        $this->_oBuilder = $oBuilder;
     }
 
     /**
@@ -130,11 +139,16 @@ class Mergy_Revision {
     public function diff() {
         $this->aDiffs = array();
         foreach ($this->aFiles as $aFile) {
-            $oCache = new Mergy_Revision_Diff($this->sRepository, $this->iRevision, $aFile['path'], $aFile['type']);
+            $oCache = $this->_oBuilder->getAggregator(Mergy_Revision_Builder::AGGREGATE_DIFF, array(
+                $this->sRepository,
+                $this->iRevision,
+                $aFile['path'],
+                $aFile['type']
+            ));
             $this->aDiffs[] = array(
                 'file' => $aFile['path'],
                 'diff' => (string) $oCache->get(),
-                'type' => $aFile['type'],
+                'type' => $aFile['type']
             );
         }
 
@@ -156,15 +170,23 @@ class Mergy_Revision {
      * @return Mergy_Revision
      */
     protected function _fetchInfo() {
-        $oCache = new Mergy_Revision_Info($this->sRepository, $this->iRevision);
-        $oInfo = simplexml_load_string($oCache->get());
-        if ($oInfo instanceof SimpleXMLElement) {
-            $this->sInfo = (string) $oInfo->logentry->msg;
-            $this->sAuthor = (string) $oInfo->logentry->author;
-            $this->sDate = (string) $oInfo->logentry->date;
+        $oAggregate = $this->_oBuilder->getAggregator(Mergy_Revision_Builder::AGGREGATE_INFO, array(
+            $this->sRepository,
+            $this->iRevision
+        ));
+
+        try {
+            $oInfo = $oAggregate->get();
+            $this->sInfo = (string) $oInfo->msg;
+            $this->sAuthor = (string) $oInfo->author;
+            $this->sDate = (string) $oInfo->date;
+            unset ($oInfo);
+        }
+        catch (Mergy_Revision_Aggregator_Exception $oException) {
+            /* currently, there is nothing to do here */
         }
 
-        unset($oCache, $oInfo);
+        unset($oAggregate);
         return $this;
     }
 
@@ -175,22 +197,19 @@ class Mergy_Revision {
      */
     protected function _fetchFiles() {
         $this->aFiles = array();
-        $oCache = new Mergy_Revision_Files($this->sRepository, $this->iRevision);
-        $oFiles = simplexml_load_string($oCache->get());
-        if ($oFiles instanceof SimpleXMLElement) {
-            foreach ($oFiles->paths->children() as $oPath) {
-                $oAttributes = $oPath->attributes();
-                $sPath = (string) $oPath;
-                if (strlen($sPath) > 0 and isset($oAttributes->kind) === true and (string) $oAttributes->kind === 'file') {
-                    $this->aFiles[] = array(
-                        'type' => (string) $oAttributes->item,
-                        'path' => (string) $sPath
-                    );
-                }
-            }
+        $oAggregate = $this->_oBuilder->getAggregator(Mergy_Revision_Builder::AGGREGATE_FILES, array(
+            $this->sRepository,
+            $this->iRevision
+        ));
+
+        try {
+            $this->aFiles = $oAggregate->get();
+        }
+        catch (Mergy_Revision_Aggregator_Exception $oException) {
+            /* currently, there is nothing to do here */
         }
 
-        unset($oCache, $oFiles);
+        unset($oAggregate);
         return $this;
     }
 }

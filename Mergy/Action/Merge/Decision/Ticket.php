@@ -57,7 +57,7 @@ class Mergy_Action_Merge_Decision_Ticket extends Mergy_Action_Merge_AbstractDeci
      */
     public function decide(Mergy_Revision $oRevision) {
         if (isset($this->_oConfig->tickets) === true and is_array($this->_oConfig->tickets) === true) {
-            $sId = self::parseTicket($oRevision);
+            $sId = self::parseTicket($oRevision->sInfo);
             if ($sId !== false and in_array($sId, $this->_oConfig->tickets) === true) {
                 return true;
             }
@@ -69,13 +69,13 @@ class Mergy_Action_Merge_Decision_Ticket extends Mergy_Action_Merge_AbstractDeci
     /**
      * Parse the ticket number of a revison-comment
      *
-     * @param  Mergy_Revision $oRevision
+     * @param  string $sInfo
      *
      * @return mixed <int | false>
      */
-    public static function parseTicket(Mergy_Revision $oRevision) {
+    public static function parseTicket($sInfo) {
         $aMatches = array();
-        preg_match('/(id|bug|ticket)(=|\s)?(\d+)/i', $oRevision->sInfo, $aMatches);
+        preg_match('/(id|bug|ticket|issues?)(\/|=|\s)?(\d+)/i', $sInfo, $aMatches);
         $sId = false;
         if (empty($aMatches[3]) !== true) {
             $sId = $aMatches[3];

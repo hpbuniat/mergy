@@ -34,14 +34,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package mergy
+ * @package Mergy
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 /**
- * Base class for cacheable SVN-Operations
+ * Exception for errors during revision-aggregator
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,65 +49,12 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-abstract class Mergy_Revision_SvnAbstract extends Mergy_Util_Cacheable {
+class Mergy_Revision_Aggregator_Exception extends Mergy_Exception {
 
     /**
-     * The repository of the revision
+     * If an error occurs, when reading revision details
      *
      * @var string
      */
-    protected $_sRepository;
-
-    /**
-     * The revisions number
-     *
-     * @var int
-     */
-    protected $_iRevision;
-
-    /**
-     * Concrete file Path
-     *
-     * @var string
-     */
-    protected $_sPath;
-
-    /**
-     * Concrete file action type
-     *
-     * @var string
-     */
-    protected $_sType;
-
-    /**
-     * Error string
-     *
-     * @var string
-     */
-    const ERROR = 'Error reading: %s';
-
-    /**
-     * Init the Revision reader
-     *
-     * @param  string $sRepository
-     * @param  int $iRevision
-     * @param  string $sPath
-     * @param  string $sType
-     */
-    public function __construct($sRepository, $iRevision, $sPath = null, $sType = null) {
-        $this->_iRevision = $iRevision;
-        $this->_sRepository = $sRepository;
-        $this->_sPath = $sPath;
-        $this->_sType = strtolower(trim((string) $sType));
-        $this->_id();
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see Mergy_Util_Cacheable::_id()
-     */
-    protected function _id() {
-        $this->_sId = md5($this->_iRevision . $this->_sRepository . $this->_sPath . $this->_sType . get_class($this));
-        return $this->_file();
-    }
+    const ERROR = 'An error occured, when reading revision details';
 }
