@@ -66,7 +66,7 @@ class Mergy_Notifier_Dbus extends Mergy_AbstractNotifier {
     public function __construct() {
         if (extension_loaded('dbus') === true) {
             $oDbus = new Dbus(Dbus::BUS_SESSION, true);
-            $this->_oProxy = $oDbus->createProxy("org.freedesktop.Notifications", "/org/freedesktop/Notifications", "org.freedesktop.Notifications");
+            $this->_oProxy = $oDbus->createProxy('org.freedesktop.Notifications', '/org/freedesktop/Notifications', 'org.freedesktop.Notifications');
         }
     }
 

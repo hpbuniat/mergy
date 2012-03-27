@@ -178,7 +178,7 @@ EOT;
      *
      * @param  array   $argv
      *
-     * @return voud
+     * @return void
      *
      * @TODO Cleanup !
      */

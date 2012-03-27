@@ -124,7 +124,7 @@ class Mergy_Revision_Aggregator {
             $aActions[] = 'diff';
         }
 
-        $sTransport = isset($this->_aArguments['config']->parallel) ? $this->_aArguments['config']->parallel : Mergy_Util_Parallel_Transport_Builder::TRANSPORT_DEFAULT;
+        $sTransport = (isset($this->_aArguments['config']->parallel) === true) ? $this->_aArguments['config']->parallel : Mergy_Util_Parallel_Transport_Builder::TRANSPORT_DEFAULT;
         $oParallel = new Mergy_Util_Parallel_Execute($this->_aRevisions, Mergy_Util_Parallel_Transport_Builder::build($sTransport));
         $this->_aRevisions = $oParallel->run($aActions)->get();
         unset($oParallel);
