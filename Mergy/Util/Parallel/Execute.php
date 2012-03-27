@@ -98,7 +98,7 @@ class Mergy_Util_Parallel_Execute {
      *
      * @var string
      */
-    const DIR = '/tmp/Mergy/';
+    const DIR = '/tmp/';
 
     /**
      * Init the Wrapper
