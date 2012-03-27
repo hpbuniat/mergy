@@ -74,6 +74,7 @@ class Mergy_Revision_Subversion_Files extends Mergy_Revision_AggregatorAbstract 
      */
     public function get() {
         parent::get();
+
         $oFiles = simplexml_load_string($this->_mCache);
         if ($oFiles instanceof SimpleXMLElement) {
             $aFiles = array();

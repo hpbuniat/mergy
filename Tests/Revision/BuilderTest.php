@@ -27,7 +27,7 @@ class Mergy_Revision_BuilderTest extends PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     public function setUp() {
-        $this->_object = new Mergy_Revision_Builder(Mergy_Revision_Builder::SUBVERSION);
+        $this->_object = new Mergy_Revision_Builder(Mergy_Revision_Builder::SUBVERSION, new Mergy_Util_Command());
     }
 
     /**

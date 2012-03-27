@@ -79,6 +79,12 @@ class Mergy_Revision_Builder {
      */
     const AGGREGATE_INFO = 'Info';
 
+    /**
+     * The command-class to pass through
+     *
+     * @var Mergy_Util_Command
+     */
+    protected $_oCommand = null;
 
     /**
      * The vcs of the project
@@ -92,8 +98,9 @@ class Mergy_Revision_Builder {
      *
      * @param  string $sVersionControl
      */
-    public function __construct($sVersionControl) {
+    public function __construct($sVersionControl, Mergy_Util_Command $oCommand) {
         $this->_sVersionControl = $sVersionControl;
+        $this->_oCommand = $oCommand;
     }
 
     /**
@@ -121,6 +128,6 @@ class Mergy_Revision_Builder {
 
         $oReflection = new ReflectionClass($sClass);
         $oAggregator = $oReflection->newInstanceArgs($aParameter);
-        return $oAggregator->setCommand(new Mergy_Util_Command());
+        return $oAggregator->setCommand($this->_oCommand);
     }
 }

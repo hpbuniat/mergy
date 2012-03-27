@@ -189,7 +189,9 @@ EOT;
             }
 
             $sVersionControl = (isset($this->_aArguments['config']->vcs) === true) ? $this->_aArguments['config']->vcs : Mergy_Revision_Builder::SUBVERSION;
-            $oBuilder = new Mergy_Revision_Builder($sVersionControl);
+
+            $oCommand = new Mergy_Util_Command();
+            $oBuilder = new Mergy_Revision_Builder($sVersionControl, $oCommand);
 
             $oAggregator = new Mergy_Revision_Aggregator($oBuilder);
             $oAggregator->set($this->_aArguments);

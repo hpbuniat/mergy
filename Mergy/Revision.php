@@ -91,14 +91,14 @@ class Mergy_Revision {
      *
      * @var array
      */
-    public $aFiles = array();
+    public $aFiles = null;
 
     /**
      * Diffs of modified files
      *
      * @var array
      */
-    public $aDiffs = array();
+    public $aDiffs = null;
 
     /**
      * The revision builder
@@ -126,8 +126,7 @@ class Mergy_Revision {
      * @return Mergy_Revision
      */
     public function read() {
-        $this->_fetchFiles()->_fetchInfo();
-
+        $this->_fetchInfo();
         return $this;
     }
 
@@ -138,8 +137,12 @@ class Mergy_Revision {
      */
     public function diff() {
         $this->aDiffs = array();
+        if ($this->aFiles === null) {
+            $this->_fetchFiles();
+        }
+
         foreach ($this->aFiles as $aFile) {
-            $oCache = $this->_oBuilder->getAggregator(Mergy_Revision_Builder::AGGREGATE_DIFF, array(
+            $oAggregate = $this->_oBuilder->getAggregator(Mergy_Revision_Builder::AGGREGATE_DIFF, array(
                 $this->sRepository,
                 $this->iRevision,
                 $aFile['path'],
@@ -147,9 +150,10 @@ class Mergy_Revision {
             ));
             $this->aDiffs[] = array(
                 'file' => $aFile['path'],
-                'diff' => (string) $oCache->get(),
+                'diff' => (string) $oAggregate->get(),
                 'type' => $aFile['type']
             );
+            unset($oAggregate);
         }
 
         return $this;
