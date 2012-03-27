@@ -10,7 +10,7 @@ class Mergy_TextUI_Output_ListTest extends PHPUnit_Framework_TestCase {
      *
      * @var Mergy_TextUI_Output_Group
      */
-    protected $object;
+    protected $_object;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -19,8 +19,8 @@ class Mergy_TextUI_Output_ListTest extends PHPUnit_Framework_TestCase {
     protected function setUp() {
         $aRevisions = include 'Tests/_files/Revisions.php';
 
-        $this->object = new Mergy_TextUI_Output_List();
-        $this->object->setRevisions($aRevisions);
+        $this->_object = new Mergy_TextUI_Output_List();
+        $this->_object->setRevisions($aRevisions);
     }
 
     /**
@@ -34,7 +34,7 @@ class Mergy_TextUI_Output_ListTest extends PHPUnit_Framework_TestCase {
      * Test the output
      */
     public function testGet() {
-        $sReturn = $this->object->get();
+        $sReturn = $this->_object->get();
         $aLines = explode(PHP_EOL, $sReturn);
         $this->assertEquals(9, count($aLines));
     }

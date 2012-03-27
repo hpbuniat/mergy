@@ -92,6 +92,15 @@ class Mergy_Notifier {
     }
 
     /**
+     * Get the notifiers
+     *
+     * @return array
+     */
+    public function getNotifiers() {
+        return $this->_aNotifiers;
+    }
+
+    /**
      * Build the enabled notifiers
      *
      * @return Mergy_Notifier
