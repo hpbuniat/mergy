@@ -16,18 +16,11 @@ class Mergy_TextUI_Output_GroupTest extends PHPUnit_Framework_TestCase {
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp() {
+    public function setUp() {
         $aRevisions = include 'Tests/_files/Revisions.php';
 
         $this->_object = new Mergy_TextUI_Output_Group();
         $this->_object->setRevisions($aRevisions);
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown() {
     }
 
     /**
