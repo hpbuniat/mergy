@@ -80,6 +80,13 @@ abstract class Mergy_Util_Cacheable {
     const DIR = '/tmp/mergy/';
 
     /**
+     * Auto-cleanup-propability-factor
+     *
+     * @var int
+     */
+    const AUTO_CLEANUP_FACTOR = 100;
+
+    /**
      * How to generate the id
      *
      * @return Mergy_Util_Cacheable
@@ -111,6 +118,7 @@ abstract class Mergy_Util_Cacheable {
     public function get() {
         if (file_exists($this->_sFile) === true) {
             $this->_mCache = unserialize(file_get_contents($this->_sFile));
+            touch($this->_sFile);
         }
         else {
             $this->_get();
@@ -132,6 +140,24 @@ abstract class Mergy_Util_Cacheable {
             }
 
             file_put_contents($this->_sFile, serialize($this->_mCache));
+        }
+
+        return $this->_cleanup();
+    }
+
+    /**
+     * Cleanup the cache-files
+     *
+     * @return Mergy_Util_Cacheable
+     */
+    protected function _cleanup() {
+        if (rand(1, self::AUTO_CLEANUP_FACTOR) === self::AUTO_CLEANUP_FACTOR) {
+            $oIter = new DirectoryIterator(self::DIR);
+            foreach ($oIter as $oFile) {
+                if ($oFile->isFile() === true and $oFile->getMTime() < (time() - 86400)) {
+                    unlink($oFile->getPathname());
+                }
+            }
         }
 
         return $this;

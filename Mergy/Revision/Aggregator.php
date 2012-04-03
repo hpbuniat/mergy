@@ -63,7 +63,7 @@ class Mergy_Revision_Aggregator {
      *
      * @var boolean
      */
-    const SKIP_DIFF = true;
+    const SKIP_DIFF = false;
 
     /**
      * Passed cli-arguments

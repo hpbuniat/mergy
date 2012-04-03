@@ -118,6 +118,8 @@ class Mergy_Util_Parallel_Transport_File implements Mergy_Util_Parallel_Transpor
             }
         }
 
+        rmdir($this->_sDir);
+
         return $this;
     }
 }
