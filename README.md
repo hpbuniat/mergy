@@ -44,10 +44,10 @@ mergy [--remote=[repository|branch]]     // remote repository, might be only a b
 Use case:
 
 // get a quick overview about which revisions of your remote are currently unmerged
-mergy --list
+mergy --list --all
 
 // get a quick overview about which revisions of your remote are currently unmerged and group them by ticket
-mergy --list-group
+mergy --list-group --all
 
 // merge all revisions of ticket #1000 and include revision 523, as it does not contain a proper commit-message
 // also ignore all force-comments

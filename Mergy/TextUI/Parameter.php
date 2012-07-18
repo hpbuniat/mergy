@@ -71,6 +71,8 @@ class Mergy_TextUI_Parameter {
         'all' => false,
         'strict' => true,
         'more' => false,
+        'config' => Mergy_TextUI_Command::CONFIG_FILE,
+        'formatter' => Mergy_TextUI_Printer_Builder::FORMAT_TEXT,
         'remote' => ''
     );
 
@@ -91,7 +93,9 @@ class Mergy_TextUI_Parameter {
         'ticket=' => null,
         'force=' => null,
         'rev=' => null,
+        'formatter=' => null,
         'path=' => null,
+        'config=' => null,
         'continue' => null,
         'more' => null,
         'reintegrate' => null,
@@ -163,6 +167,10 @@ class Mergy_TextUI_Parameter {
 
                 case '--path':
                     self::$_aArguments['path'] = $option[1];
+                    break;
+
+                case '--formatter':
+                    self::$_aArguments['formatter'] = $option[1];
                     break;
 
                 case '--more':

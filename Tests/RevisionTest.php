@@ -37,7 +37,7 @@ class Mergy_RevisionTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @todo Implement testDiff().
+     * Test for getting detailed file-changes
      */
     public function testDiff() {
         $sXml = include 'Tests/_files/Response/Revision/Files.php';

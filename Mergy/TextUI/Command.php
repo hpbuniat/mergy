@@ -190,30 +190,26 @@ EOT;
 
             $sVersionControl = (isset($this->_aArguments['config']->vcs) === true) ? $this->_aArguments['config']->vcs : Mergy_Revision_Builder::SUBVERSION;
 
-            $oCommand = new Mergy_Util_Command();
-            $oBuilder = new Mergy_Revision_Builder($sVersionControl, $oCommand);
+            $oBuilder = new Mergy_Revision_Builder($sVersionControl, new Mergy_Util_Command());
 
             $oAggregator = new Mergy_Revision_Aggregator($oBuilder);
             $oAggregator->set($this->_aArguments);
 
-            if ($this->_aArguments['list'] === true) {
-                $aRevisions =  $oAggregator->run($oAggregator::SKIP_DIFF)->get();
+            $bDiff = ($this->_aArguments['list'] === true) ? $oAggregator::SKIP_DIFF : $oAggregator::CREATE_DIFF;
+            $aRevisions =  $oAggregator->run($bDiff)->get();
+            if ($this->_aArguments['all'] !== true) {
+                $oRevisions = new Mergy_Action_Merge_Revisions();
+                $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
+                unset($oRevisions);
+            }
 
-                $sPrinter = 'Mergy_TextUI_Output_' . (($this->_aArguments['group'] === true) ? 'Group' : 'List');
-                $oPrinter = new $sPrinter();
+            $this->_aArguments['config']->mergeRevisions = $aRevisions;
+            if ($this->_aArguments['list'] === true) {
+                $sPrinter = ($this->_aArguments['group'] === true) ? 'Group' : 'List';
+                $oPrinter = Mergy_TextUI_Printer_Builder::build($sPrinter, $this->_aArguments['formatter']);
                 Mergy_TextUI_Output::info($oPrinter->setRevisions($aRevisions)->get());
             }
             else {
-                $aRevisions =  $oAggregator->run()->get();
-
-                if ($this->_aArguments['all'] !== true) {
-                    $oRevisions = new Mergy_Action_Merge_Revisions();
-                    $aRevisions = $oRevisions->setup($aRevisions, $this->_aArguments['config'])->get();
-                    unset($oRevisions);
-                }
-
-                $this->_aArguments['config']->mergeRevisions = $aRevisions;
-
                 $oAction = new Mergy_Action($this->_aArguments['config'], $this->_oNotifier);
                 $oAction->setup();
 
@@ -231,7 +227,7 @@ EOT;
             }
 
             $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, self::FINISHED);
-            unset($oAggregator, $this->_oNotifier);
+            unset($aRevisions, $oBuilder, $oAggregator, $this->_oNotifier);
         }
         catch (RuntimeException $e) {
             Mergy_TextUI_Output::error($e->getMessage());
@@ -273,6 +269,10 @@ EOT;
             return false;
         }
 
+        if (($this->_aArguments['config'] instanceof stdClass) !== true) {
+            $this->_aArguments['config'] = new stdClass();
+        }
+
         if (empty($this->_aArguments['remote']) !== true and preg_match('!http(s)?://!i', $this->_aArguments['remote']) === 0) {
             if (isset($this->_aArguments['config']->remote) === true) {
                 $aRemote = explode('/', $this->_aArguments['config']->remote);
@@ -295,6 +295,14 @@ EOT;
         $this->_aArguments['config']->force = explode(',', $this->_aArguments['config']->force);
         if ($this->_aArguments['strict'] === true) {
             $this->_aArguments['config']->force = false;
+        }
+
+        if (empty($this->_aArguments['config']->merge) === true) {
+            $this->_aArguments['config']->merge = array(
+                'ticket',
+                'comment',
+                'revision'
+            );
         }
 
         $this->_oNotifier = new Mergy_Notifier($this->_aArguments['config']);

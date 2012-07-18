@@ -49,43 +49,28 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-
-class Mergy_TextUI_Output_Group extends Mergy_TextUI_OutputAbstract {
+class Mergy_TextUI_Printer_List extends Mergy_TextUI_Printer_AbstractPrinter {
 
     /**
      * (non-PHPdoc)
+     *
      * @see Mergy_TextUI_OutputAbtract::_process()
      */
     protected function _process() {
-        $bBackground = true;
-        $this->_sOutput = '';
-        $aTickets = array();
+        $aStack = array();
         foreach ($this->_aRevisions as $oRevision) {
             if ($oRevision instanceof Mergy_Revision) {
-                $sTicket = (int) Mergy_Action_Merge_Decision_Ticket::parseTicket($oRevision->sInfo);
-                if (empty($aTickets[$sTicket]) === true) {
-                    $aTickets[$sTicket] = array();
-                }
-
-                $aTickets[$sTicket][] = $oRevision;
+                $aStack[] = array(
+                    'title' => '',
+                    'rev' => $oRevision->iRevision,
+                    'author' => $oRevision->sAuthor,
+                    'comment' => $oRevision->sInfo,
+                    'text' => $oRevision->__toString()
+                );
             }
         }
 
-        ksort($aTickets);
-        foreach ($aTickets as $sTicket => $aRevisions) {
-            $sTicket = ($sTicket === 0) ? 'unspecified' : $sTicket;
-            $aAuthors = $aRevisionNumbers = array();
-            foreach ($aRevisions as $oRevision) {
-                $aRevisionNumbers[] = $oRevision->iRevision;
-                $aAuthors[] = $oRevision->sAuthor;
-            }
-
-            $aAuthors = array_unique($aAuthors);
-            sort($aRevisionNumbers);
-            $this->_sOutput .= sprintf("\033[0;30m\033[47mTicket: %s (%s)\033[0m", $sTicket, implode(',', $aAuthors)) . PHP_EOL;
-            $this->_sOutput .= "\t" . implode(',', $aRevisionNumbers) . PHP_EOL;
-        }
-
+        $this->_sOutput = $this->_oFormatter->format($aStack);
         return $this;
     }
 }

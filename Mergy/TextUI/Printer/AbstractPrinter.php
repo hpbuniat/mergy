@@ -49,7 +49,7 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-abstract class Mergy_TextUI_OutputAbstract {
+abstract class Mergy_TextUI_Printer_AbstractPrinter {
 
     /**
      * A list of revisions
@@ -64,6 +64,13 @@ abstract class Mergy_TextUI_OutputAbstract {
      * @var string
      */
     protected $_sOutput = '';
+
+    /**
+     * The formatter
+     *
+     * @var Mergy_TextUI_Printer_FormatterInterface
+     */
+    protected $_oFormatter;
 
     /**
      * Set revisions
@@ -86,6 +93,18 @@ abstract class Mergy_TextUI_OutputAbstract {
         $this->_process();
         $this->_sOutput = trim($this->_sOutput);
         return $this->_sOutput;
+    }
+
+    /**
+     * Set the formatter
+     *
+     * @param  Mergy_TextUI_Printer_FormatterInterface $oFormatter
+     *
+     * @return Mergy_TextUI_OutputAbstract
+     */
+    public function setFormatter(Mergy_TextUI_Printer_FormatterInterface $oFormatter) {
+        $this->_oFormatter = $oFormatter;
+        return $this;
     }
 
     /**

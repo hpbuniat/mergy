@@ -41,7 +41,7 @@
  */
 
 /**
- * Output revisions as list
+ * Text-Formatter-Interface
  *
  * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
@@ -49,30 +49,14 @@
  * @version Release: @package_version@
  * @link https://github.com/hpbuniat/mergy
  */
-class Mergy_TextUI_Output_List extends Mergy_TextUI_OutputAbstract {
+interface Mergy_TextUI_Printer_FormatterInterface {
 
     /**
-     * (non-PHPdoc)
-     * @see Mergy_TextUI_OutputAbtract::_process()
+     * How to format the output
+     *
+     * @param  array $aStack Stack of revisions
+     *
+     * @return string
      */
-    protected function _process() {
-        $bBackground = true;
-        $this->_sOutput = '';
-        foreach ($this->_aRevisions as $oRevision) {
-            if ($oRevision instanceof Mergy_Revision) {
-                $sPrint = $oRevision->__toString();
-                if ($bBackground === true) {
-                    $bBackground = false;
-                    $sPrint = "\033[0;30m\033[47m" . $sPrint . "\033[0m";
-                }
-                else {
-                    $bBackground = true;
-                }
-
-                $this->_sOutput .= $sPrint . PHP_EOL;
-            }
-        }
-
-        return $this;
-    }
+    public function format(array $aStack);
 }
