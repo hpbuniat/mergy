@@ -73,6 +73,13 @@ abstract class Mergy_TextUI_Printer_AbstractPrinter {
     protected $_oFormatter;
 
     /**
+     * Exception-Text
+     *
+     * @var string
+     */
+    const NO_FORMATTER = 'No formatter was set';
+
+    /**
      * Set revisions
      *
      * @param  array $aRevisions
@@ -90,6 +97,10 @@ abstract class Mergy_TextUI_Printer_AbstractPrinter {
      * @return string
      */
     public function get() {
+        if (($this->_oFormatter instanceof Mergy_TextUI_Printer_FormatterInterface) !== true) {
+            throw new Mergy_Exception(self::NO_FORMATTER);
+        }
+
         $this->_process();
         $this->_sOutput = trim($this->_sOutput);
         return $this->_sOutput;

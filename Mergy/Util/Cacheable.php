@@ -136,7 +136,7 @@ abstract class Mergy_Util_Cacheable {
     public function write() {
         if (empty($this->_mCache) !== true) {
             if (is_dir(self::DIR) !== true) {
-                mkdir(self::DIR, 0744, true);
+                mkdir(self::DIR, 0777, true);
             }
 
             file_put_contents($this->_sFile, serialize($this->_mCache));
