@@ -71,6 +71,7 @@ class Mergy_TextUI_Parameter {
         'all' => false,
         'strict' => true,
         'more' => false,
+        'commit' => false,
         'unattended' => false,
         'config' => Mergy_TextUI_Command::CONFIG_FILE,
         'formatter' => Mergy_TextUI_Printer_Builder::FORMAT_TEXT,
@@ -185,6 +186,7 @@ class Mergy_TextUI_Parameter {
 
                 case '--commit':
                     self::$_aArguments['continue'] = true;
+                    self::$_aArguments['commit'] = true;
                     break;
 
                 case '--unattended':

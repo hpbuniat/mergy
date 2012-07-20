@@ -63,7 +63,7 @@ class Mergy_Action_Concrete_Commit extends Mergy_Action_AbstractAction {
      * @see Mergy_Action_AbstractAction::_execute()
      */
     protected function _execute() {
-        if ($this->_oConfig->more !== true) {
+        if (($this->_oConfig->unattended !== true or $this->_oConfig->commit === true) and $this->_oConfig->more !== true) {
             $sMessage = sprintf('-- merged with %s', $this->_oConfig->remote) . PHP_EOL
                       . sprintf('-- by %s (%s)', Mergy_TextUI_Command::NAME, Mergy_TextUI_Command::URL) . PHP_EOL . PHP_EOL;
 

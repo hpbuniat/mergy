@@ -81,7 +81,7 @@ class Mergy_Util_Merge_Tracker {
         $this->_oConfig = $oConfig;
         $this->_sFile = Mergy_Util_Cacheable::DIR . md5($this->_oConfig->remote);
         if (is_dir(Mergy_Util_Cacheable::DIR) !== true) {
-            mkdir(Mergy_Util_Cacheable::DIR);
+            mkdir(Mergy_Util_Cacheable::DIR, 0777, true);
         }
 
         $this->_read();
@@ -132,6 +132,8 @@ class Mergy_Util_Merge_Tracker {
      */
     protected function _write() {
         file_put_contents($this->_sFile, serialize($this->_aTickets));
+        chmod($this->_sFile, 0666);
+
         return $this;
     }
 }

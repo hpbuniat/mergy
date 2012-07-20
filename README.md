@@ -32,7 +32,7 @@ mergy [--remote=[repository|branch]]     // remote repository, might be only a b
       [--all]                            // use all unmerged revisions
       [--diff-all]                       // equals --diff --all
       [--strict]                         // only merge, what was given - no force via config, this is the default
-      [--commit]                         // commit changes in the wc - with tracked log, if present
+      [--commit]                         // commit changes in the wc - with tracked log, if present (only, if unattended)
       [--more]                           // skip commit
       [--unattended]                     // skip optional confirmations
 

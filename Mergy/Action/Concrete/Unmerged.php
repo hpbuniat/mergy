@@ -68,6 +68,10 @@ class Mergy_Action_Concrete_Unmerged extends Mergy_Action_AbstractAction {
             $this->_bSuccess = false;
         }
 
+        if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
+            Mergy_TextUI_Output::info(implode(',', explode(PHP_EOL, trim($this->_oCommand->get()))));
+        }
+
         return $this;
     }
 }

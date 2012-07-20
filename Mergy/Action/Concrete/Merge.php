@@ -70,7 +70,7 @@ class Mergy_Action_Concrete_Merge extends Mergy_Action_AbstractAction {
      *
      * @var string
      */
-    const PROBLEM = 'A problem (e.g. a conflict) occured while merging. Take a look at the working-copy, press enter when finished';
+    const PROBLEM = 'A problem (e.g. a conflict) occured while merging. Take a look at the working-copy and restart the process with --continue';
 
     /**
      * Toggle revision-mode for merge
@@ -105,7 +105,11 @@ class Mergy_Action_Concrete_Merge extends Mergy_Action_AbstractAction {
      * @see Mergy_Action_AbstractAction::_execute()
      */
     protected function _execute() {
-        $sCommand = 'svn merge ' . $this->_oConfig->remote . ' --accept postpone --non-interactive ' . $this->_sRevision . ' ' . $this->_oConfig->path . ' | awk \'{a["A"]=32;a["U"]=34;a["C"]=31;a["M"]=34;a["G"]=37;a["?"]=33;a["D"]=36;printf("\033[1;%sm%s\033[0;00m\n",a[$1],$0)}\'';
+        $sCommand = 'svn merge ' . $this->_oConfig->remote . ' --accept postpone --non-interactive ' . $this->_sRevision . ' ' . $this->_oConfig->path;
+        if ($this->_oConfig->unattended !== true) {
+            $sCommand .= ' | awk \'{a["A"]=32;a["U"]=34;a["C"]=31;a["M"]=34;a["G"]=37;a["?"]=33;a["D"]=36;printf("\033[1;%sm%s\033[0;00m\n",a[$1],$0)}\'';
+        }
+
         $this->_oCommand->execute($sCommand);
 
         $sResult = $this->_oCommand->get();

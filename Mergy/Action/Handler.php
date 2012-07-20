@@ -84,7 +84,7 @@ class Mergy_Action_Handler {
      *
      * @var string
      */
-    const SINGLE = 'unspecified';
+    const SINGLE = 'instant';
 
     /**
      * Init the handler
@@ -126,7 +126,7 @@ class Mergy_Action_Handler {
 
         $sProcess = $oProcess->getName();
         if (defined('VERBOSE') === true and VERBOSE === true) {
-            Mergy_TextUI_Output::info('Adding ' . $sProcess . ' to ' . $sStack);
+            Mergy_TextUI_Output::info(sprintf('Adding action "%s" to the %s-stack', $sProcess, $sStack));
         }
 
         $this->_aStacks[$sStack][$sProcess] = $oProcess;
@@ -167,7 +167,7 @@ class Mergy_Action_Handler {
 
                 $this->_aReturn[$oProcess->getName()] = $oProcess->execute()->get();
                 if ($oProcess->isSuccess() !== true) {
-                    throw new Exception($oProcess::PROBLEM);
+                    throw new Mergy_Exception($oProcess::PROBLEM);
                 }
             }
         }
@@ -192,7 +192,10 @@ class Mergy_Action_Handler {
                 $oMerge->revision($oRevision->iRevision);
             }
 
-            $oMerge->execute($oMerge::PROBLEM);
+            $oMerge->execute();
+            if ($oMerge->isSuccess() !== true) {
+                throw new Mergy_Exception($oMerge::PROBLEM);
+            }
         }
 
         return $this;

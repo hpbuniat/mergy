@@ -68,8 +68,24 @@ class Mergy_Action_Concrete_Revert extends Mergy_Action_AbstractAction {
             $this->_bSuccess = false;
         }
 
-        $this->_oCommand->execute('svn status --no-ignore ' . $this->_oConfig->path . ' | grep -e ^\? -e ^I | awk \'{print $2}\'| xargs -r rm -r');
-        $this->_oCommand->execute('svn up ' . $this->_oConfig->path);
+        if ($this->_bSuccess === true) {
+            $this->_oCommand->execute('svn status --no-ignore ' . $this->_oConfig->path . ' | grep -e ^\? -e ^I | awk \'{print $2}\'| xargs -r rm -r');
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_bSuccess = false;
+            }
+        }
+
+        if ($this->_bSuccess === true) {
+            $this->_oCommand->execute('svn up ' . $this->_oConfig->path);
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_bSuccess = false;
+            }
+        }
+
+        if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
+            Mergy_TextUI_Output::info($this->_oCommand->get());
+        }
+
         return $this;
     }
 }

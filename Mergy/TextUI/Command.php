@@ -125,14 +125,16 @@ Usage: mergy [switches]
       [--all]                            // use all unmerged revisions
       [--diff-all]                       // equals --diff --all
       [--strict]                         // only merge, what was given - no force via config
-      [--commit]                         // commit changes in the wc - with tracked log, if present
+      [--commit]                         // commit changes in the wc - with tracked log, if present (only, if unattended)
       [--more]                           // skip commit
+      [--unattended]                     // skip optional confirmations
 
       // further parameters
       [--verbose]                        // verbose
       [--force=keyword[,keyword]]        // keywords to force merge of this revisons, if unmerged
       [--config=mergy.json]              // use this config-file
-      [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
+      [--formatter=text]                 // use a specific formatter - only for --list
+      [--path=[PATH_TO_WC]]              // use this working copy (instead of .))
 
 EOT;
 
@@ -152,8 +154,10 @@ EOT;
         'remote' => 'remote',
         'path' => 'path',
         'tickets' => 'tickets',
+        'commit' => 'commit',
         'reintegrate' => 'reintegrate',
         'continue' => 'continue',
+        'unattended' => 'unattended',
         'more' => 'more',
         'force-comment' => 'force'
     );
