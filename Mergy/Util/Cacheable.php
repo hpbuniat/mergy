@@ -80,6 +80,13 @@ abstract class Mergy_Util_Cacheable {
     const DIR = '/tmp/mergy/';
 
     /**
+     * The lifetime
+     *
+     * @var int
+     */
+    const LIFETIME = 1209600;
+
+    /**
      * Auto-cleanup-propability-factor
      *
      * @var int
@@ -140,6 +147,7 @@ abstract class Mergy_Util_Cacheable {
             }
 
             file_put_contents($this->_sFile, serialize($this->_mCache));
+            chmod($this->_sFile, 0666);
         }
 
         return $this->_cleanup();
@@ -154,7 +162,7 @@ abstract class Mergy_Util_Cacheable {
         if (rand(1, self::AUTO_CLEANUP_FACTOR) === self::AUTO_CLEANUP_FACTOR) {
             $oIter = new DirectoryIterator(self::DIR);
             foreach ($oIter as $oFile) {
-                if ($oFile->isFile() === true and $oFile->getMTime() < (time() - 86400)) {
+                if ($oFile->isFile() === true and $oFile->getMTime() < (time() - self::LIFETIME)) {
                     unlink($oFile->getPathname());
                 }
             }
