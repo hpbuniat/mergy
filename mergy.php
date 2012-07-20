@@ -41,7 +41,7 @@
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', dirname(__FILE__));
+(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
 if (strpos('@php_bin@', '@php_bin') === 0) {
     set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
 }

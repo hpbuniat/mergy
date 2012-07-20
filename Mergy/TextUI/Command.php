@@ -94,6 +94,13 @@ class Mergy_TextUI_Command {
     const NAME = 'mergy';
 
     /**
+     * The project-url
+     *
+     * @var string
+     */
+    const URL = 'https://github.com/hpbuniat/mergy';
+
+    /**
      * The version
      *
      * @var string
@@ -195,7 +202,7 @@ EOT;
             $oAggregator = new Mergy_Revision_Aggregator($oBuilder);
             $oAggregator->set($this->_aArguments);
 
-            $bDiff = ($this->_aArguments['list'] === true) ? $oAggregator::SKIP_DIFF : $oAggregator::CREATE_DIFF;
+            $bDiff = ($this->_aArguments['diff'] === true) ? $oAggregator::CREATE_DIFF : $oAggregator::SKIP_DIFF;
             $aRevisions =  $oAggregator->run($bDiff)->get();
             if ($this->_aArguments['all'] !== true) {
                 $oRevisions = new Mergy_Action_Merge_Revisions();

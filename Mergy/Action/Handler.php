@@ -73,6 +73,13 @@ class Mergy_Action_Handler {
     protected $_oConfig;
 
     /**
+     * The notifier
+     *
+     * @var Mergy_Notifier
+     */
+    protected $_oNotifier;
+
+    /**
      * Const for unique-actions
      *
      * @var string
@@ -82,9 +89,10 @@ class Mergy_Action_Handler {
     /**
      * Init the handler
      */
-    public function __construct(stdClass $oConfig) {
+    public function __construct(stdClass $oConfig, Mergy_Notifier $oNotifier) {
         $this->reset();
         $this->_oConfig = $oConfig;
+        $this->_oNotifier = $oNotifier;
     }
 
     /**
@@ -176,7 +184,7 @@ class Mergy_Action_Handler {
      */
     public function merge(array $aRevisions) {
         foreach ($aRevisions as $oRevision) {
-            $oMerge = new Mergy_Action_Concrete_Merge($this->_oConfig, new stdClass());
+            $oMerge = new Mergy_Action_Concrete_Merge($this->_oConfig, new stdClass(), $this->_oNotifier);
             if ($this->_oConfig->reintegrate === true) {
                 $oMerge->reintegrate();
             }

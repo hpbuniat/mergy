@@ -105,7 +105,7 @@ class Mergy_Action {
      * @param  Mergy_Notifier $oNotifier
      */
     public function __construct(stdclass $oConfig, Mergy_Notifier $oNotifier) {
-        $this->_oActionHandler = new Mergy_Action_Handler($oConfig);
+        $this->_oActionHandler = new Mergy_Action_Handler($oConfig, $oNotifier);
         $this->_oConfig = $oConfig;
         $this->_oNotifier = $oNotifier;
         if (isset($oConfig->mergeRevisions) === true) {

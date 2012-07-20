@@ -91,7 +91,7 @@ abstract class Mergy_Action_AbstractAction {
      *
      * @var string
      */
-    const MSG_CONTINUE = 'Target %s was executed. Press Enter to continue!';
+    const MSG_CONTINUE = 'Target %s was executed.';
 
     /**
      * Init an Action
@@ -165,9 +165,13 @@ abstract class Mergy_Action_AbstractAction {
 
         if ($bExecute === true) {
             $this->_execute();
-            if (($this->isSuccess() !== true and empty($sMessage) !== true)
-                or (isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true)) {
-                $this->_confirm($sMessage, $aExpected);
+            $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
+            $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
+
+            if ($this->_oConfig->unattended !== true and
+                (($this->isSuccess() !== true and empty($sMessage) !== true)
+                    or ($this->_oProperties->confirm === true and isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true))) {
+                $this->_confirm($aExpected);
             }
         }
 
@@ -177,15 +181,12 @@ abstract class Mergy_Action_AbstractAction {
     /**
      * Confirm the result of an action
      *
-     * @param  string $sMessage The Message to show
      * @param  array $aExpected The expected input - needs keys continue & abort
      *
      * @return Mergy_Action_AbstractAction
      */
-    protected function _confirm($sMessage = '', array $aExpected = array()) {
-        $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
-        $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
-        Mergy_TextUI_Output::info('waiting ...');
+    protected function _confirm(array $aExpected = array()) {
+        Mergy_TextUI_Output::info('Press Enter to continue!');
         do {
             $rInput = fopen('php://stdin', 'r');
             $sInput = trim(fgets($rInput));

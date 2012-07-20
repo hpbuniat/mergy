@@ -114,6 +114,9 @@ class Mergy_Notifier {
                 }
             }
         }
+        else {
+            $this->_aNotifiers[] = new Mergy_Notifier_Stdout();
+        }
 
         return $this;
     }

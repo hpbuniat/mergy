@@ -64,11 +64,13 @@ class Mergy_Action_Concrete_Commit extends Mergy_Action_AbstractAction {
      */
     protected function _execute() {
         if ($this->_oConfig->more !== true) {
-            $sMessage = '-- merged with ' . $this->_oConfig->remote . PHP_EOL
-                      . '-- by mergy' . PHP_EOL . PHP_EOL;
+            $sMessage = sprintf('-- merged with %s', $this->_oConfig->remote) . PHP_EOL
+                      . sprintf('-- by %s (%s)', Mergy_TextUI_Command::NAME, Mergy_TextUI_Command::URL) . PHP_EOL . PHP_EOL;
 
-            foreach ($this->_oConfig->tracked as $sTicket) {
-                $sMessage .= '-- ' . $this->_oConfig->issues . $sTicket . PHP_EOL;
+            if (empty($this->_oConfig->tracked) !== true) {
+                foreach ($this->_oConfig->tracked as $sTicket) {
+                    $sMessage .= '-- ' . $this->_oConfig->issues . $sTicket . PHP_EOL;
+                }
             }
 
             $this->_oCommand->execute('svn ci ' . $this->_oConfig->path . ' --message "' . $sMessage . '"');
