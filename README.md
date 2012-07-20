@@ -43,7 +43,7 @@ mergy [--remote=[repository|branch]]     // remote repository, might be only a b
       [--formatter=text]                 // use a specific formatter - only for --list
       [--path=[PATH_TO_WC]]              // use this working copy (instead of .)
 
-Use case:
+### Use case:
 
 // get a quick overview about which revisions of your remote are currently unmerged
 mergy --list --all
