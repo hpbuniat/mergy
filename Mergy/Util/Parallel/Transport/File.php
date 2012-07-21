@@ -73,7 +73,7 @@ class Mergy_Util_Parallel_Transport_File implements Mergy_Util_Parallel_Transpor
         if (empty($aOptions['dir']) !== true and is_dir($aOptions['dir']) === true) {
             $sUniqueId = uniqid(self::PREFIX);
             $this->_sDir = $aOptions['dir'] . $sUniqueId;
-            mkdir($this->_sDir, 0744, true);
+            mkdir($this->_sDir, 0777, true);
 
             return $this;
         }

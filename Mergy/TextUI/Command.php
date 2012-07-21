@@ -181,7 +181,7 @@ EOT;
      */
     public static function main() {
         $oCommand = new Mergy_TextUI_Command();
-        $oCommand->run($_SERVER['argv']);
+        return $oCommand->run($_SERVER['argv']);
     }
 
     /**
@@ -189,7 +189,7 @@ EOT;
      *
      * @param  array   $argv
      *
-     * @return void
+     * @return int, exit-code
      *
      * @TODO Cleanup !
      */
@@ -242,7 +242,10 @@ EOT;
         }
         catch (RuntimeException $e) {
             Mergy_TextUI_Output::error($e->getMessage());
+            return self::ERROR_EXIT;
         }
+
+        return self::SUCCESS_EXIT;
     }
 
     /**

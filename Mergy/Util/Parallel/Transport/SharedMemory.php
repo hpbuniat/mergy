@@ -81,7 +81,7 @@ class Mergy_Util_Parallel_Transport_SharedMemory implements Mergy_Util_Parallel_
             $sUniqueId = uniqid(self::PREFIX);
             $this->_sDir = $aOptions['dir'] . $sUniqueId;
             if (is_dir($this->_sDir) !== true) {
-                mkdir($this->_sDir, 0744, true);
+                mkdir($this->_sDir, 0777, true);
             }
 
             if (is_dir($this->_sDir) === true) {

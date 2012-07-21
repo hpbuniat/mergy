@@ -132,7 +132,9 @@ class Mergy_Util_Merge_Tracker {
      */
     protected function _write() {
         file_put_contents($this->_sFile, serialize($this->_aTickets));
-        chmod($this->_sFile, 0666);
+        if (file_exists($this->_sFile) === true) {
+            chmod($this->_sFile, 0666);
+        }
 
         return $this;
     }

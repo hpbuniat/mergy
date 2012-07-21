@@ -48,4 +48,5 @@ if (strpos('@php_bin@', '@php_bin') === 0) {
 
 require 'Mergy' . DIRECTORY_SEPARATOR . 'Autoload.php';
 
-Mergy_TextUI_Command::main();
+$iExit = Mergy_TextUI_Command::main();
+exit($iExit);
