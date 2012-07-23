@@ -65,7 +65,7 @@ class Mergy_TextUI_Printer_Formatter_Xml implements Mergy_TextUI_Printer_Formatt
             $oWriter->writeAttribute('rev', $aText['rev']);
             $oWriter->writeAttribute('title', $aText['title']);
             $oWriter->writeAttribute('author', $aText['author']);
-            $oWriter->text($aText['comment']);
+            $oWriter->text(preg_replace('/\s/', ' ', $aText['comment']));
             $oWriter->endElement();
         }
 
