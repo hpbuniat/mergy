@@ -170,7 +170,7 @@ abstract class Mergy_Action_AbstractAction {
 
             if ($this->_oConfig->unattended !== true and
                 (($this->isSuccess() !== true and empty($sMessage) !== true)
-                    or ($this->_oProperties->confirm === true and isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true))) {
+                    or (isset($this->_oProperties->confirm) === true and $this->_oProperties->confirm === true))) {
                 $this->_confirm($aExpected);
             }
         }
