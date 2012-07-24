@@ -83,8 +83,10 @@ class Mergy_Action_Concrete_Commit extends Mergy_Action_AbstractAction {
             if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
                 Mergy_TextUI_Output::info($this->_oCommand->get());
             }
+
+            return true;
         }
 
-        return $this;
+        return false;
     }
 }

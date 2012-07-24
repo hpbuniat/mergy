@@ -86,7 +86,6 @@ class Mergy_Action_Concrete_Merge extends Mergy_Action_AbstractAction {
         }
 
         $this->_sRevision = '-c ' . $iRevision;
-
         return $this;
     }
 
@@ -122,6 +121,6 @@ class Mergy_Action_Concrete_Merge extends Mergy_Action_AbstractAction {
             Mergy_TextUI_Output::info($sResult);
         }
 
-        return $this;
+        return true;
     }
 }

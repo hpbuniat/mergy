@@ -86,6 +86,6 @@ class Mergy_Action_Concrete_Revert extends Mergy_Action_AbstractAction {
             Mergy_TextUI_Output::info($this->_oCommand->get());
         }
 
-        return $this;
+        return true;
     }
 }

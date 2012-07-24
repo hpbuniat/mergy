@@ -68,8 +68,10 @@ class Mergy_Action_Concrete_Command extends Mergy_Action_AbstractAction {
             if ($this->_oCommand->isSuccess() !== true) {
                 $this->_bSuccess = false;
             }
+
+            return true;
         }
 
-        return $this;
+        return false;
     }
 }

@@ -90,7 +90,7 @@ class Mergy_Util_Command {
      */
     public function command($sCommand = null) {
         if (empty($sCommand) !== true) {
-            $this->_sCommand = $sCommand;
+            $this->_sCommand = sprintf('%s 2>&1', $sCommand);
         }
 
         return $this;

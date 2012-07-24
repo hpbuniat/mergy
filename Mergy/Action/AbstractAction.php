@@ -164,9 +164,10 @@ abstract class Mergy_Action_AbstractAction {
         }
 
         if ($bExecute === true) {
-            $this->_execute();
-            $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
-            $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
+            if ($this->_execute() === true) {
+                $sMessage = (empty($sMessage) === true) ? self::MSG_CONTINUE : $sMessage;
+                $this->_oNotifier->notify(Mergy_AbstractNotifier::INFO, sprintf($sMessage, $this->getName()));
+            }
 
             if ($this->_oConfig->unattended !== true and
                 (($this->isSuccess() !== true and empty($sMessage) !== true)
@@ -206,7 +207,7 @@ abstract class Mergy_Action_AbstractAction {
     /**
      * Execute an action - concrete
      *
-     * @return Mergy_Action_AbstractAction
+     * @return boolean
      */
     abstract protected function _execute();
 }

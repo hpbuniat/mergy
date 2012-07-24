@@ -72,6 +72,6 @@ class Mergy_Action_Concrete_Unmerged extends Mergy_Action_AbstractAction {
             Mergy_TextUI_Output::info(implode(',', explode(PHP_EOL, trim($this->_oCommand->get()))));
         }
 
-        return $this;
+        return true;
     }
 }
