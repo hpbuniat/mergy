@@ -84,7 +84,7 @@ abstract class Mergy_TextUI_Printer_AbstractPrinter {
      *
      * @param  array $aRevisions
      *
-     * @return Mergy_TextUI_Output
+     * @return Mergy_TextUI_Printer_AbstractPrinter
      */
     public function setRevisions(array $aRevisions) {
         $this->_aRevisions = $aRevisions;
@@ -95,6 +95,8 @@ abstract class Mergy_TextUI_Printer_AbstractPrinter {
      * Get the revision-output
      *
      * @return string
+     *
+     * @throws Mergy_Exception
      */
     public function get() {
         if (($this->_oFormatter instanceof Mergy_TextUI_Printer_FormatterInterface) !== true) {
@@ -111,7 +113,7 @@ abstract class Mergy_TextUI_Printer_AbstractPrinter {
      *
      * @param  Mergy_TextUI_Printer_FormatterInterface $oFormatter
      *
-     * @return Mergy_TextUI_OutputAbstract
+     * @return Mergy_TextUI_Printer_AbstractPrinter
      */
     public function setFormatter(Mergy_TextUI_Printer_FormatterInterface $oFormatter) {
         $this->_oFormatter = $oFormatter;
@@ -121,7 +123,7 @@ abstract class Mergy_TextUI_Printer_AbstractPrinter {
     /**
      * Process the revisions and create the output
      *
-     * @return Mergy_TextUI_OutputAbtract
+     * @return Mergy_TextUI_Printer_AbstractPrinter
      */
     abstract protected function _process();
 }

@@ -114,7 +114,7 @@ abstract class Mergy_Revision_AggregatorAbstract extends Mergy_Util_Cacheable {
      *
      * @param  Mergy_Util_Command $oCommand
      *
-     * @return Mergy_Revision_RevisionAbstract
+     * @return Mergy_Revision_AggregatorAbstract
      */
     public function setCommand(Mergy_Util_Command $oCommand) {
         $this->_oCommand = $oCommand;

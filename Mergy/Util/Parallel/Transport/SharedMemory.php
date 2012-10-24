@@ -54,7 +54,7 @@ class Mergy_Util_Parallel_Transport_SharedMemory implements Mergy_Util_Parallel_
     /**
      * Shared-Memory
      *
-     * @var ressource
+     * @var resource
      */
     private $_rShared = null;
 

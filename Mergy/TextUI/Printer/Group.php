@@ -69,6 +69,7 @@ class Mergy_TextUI_Printer_Group extends Mergy_TextUI_Printer_AbstractPrinter {
             }
         }
 
+        $aStack = array();
         ksort($aTickets);
         foreach ($aTickets as $sTicket => $aRevisions) {
             $sTicket = ($sTicket === 0) ? 'unspecified' : $sTicket;

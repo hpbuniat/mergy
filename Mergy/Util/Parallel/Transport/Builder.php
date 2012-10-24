@@ -82,7 +82,7 @@ class Mergy_Util_Parallel_Transport_Builder {
     /**
      * Build a transport
      *
-     * @param  string $sType
+     * @param  string $sTransport
      *
      * @return Mergy_Util_Parallel_TransportInterface
      *
