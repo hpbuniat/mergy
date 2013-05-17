@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,51 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Action\Merge\Decision;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+use \Mergy\Action\Merge\AbstractDecision;
+
+/**
+ * Decide whether to merge a revision, depending on a ticket-number in the commit message
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Ticket extends AbstractDecision {
+
+    /**
+     * (non-PHPdoc)
+     * @see AbstractDecision::decide()
+     */
+    public function decide(\Mergy\Revision $oRevision) {
+        if (isset($this->_oConfig->tickets) === true and is_array($this->_oConfig->tickets) === true) {
+            $sId = self::parseTicket($oRevision->sInfo);
+            if ($sId !== false and in_array($sId, $this->_oConfig->tickets) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Parse the ticket number of a revision-comment
+     *
+     * @param  string $sInfo
+     *
+     * @return mixed <int | false>
+     */
+    public static function parseTicket($sInfo) {
+        $aMatches = array();
+        preg_match('/(id|bug|ticket|issues?)(\/|=|\s)?(\d+)/i', $sInfo, $aMatches);
+        $sId = false;
+        if (empty($aMatches[3]) !== true) {
+            $sId = $aMatches[3];
+        }
+
+        return $sId;
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

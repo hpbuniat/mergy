@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,56 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Action\Concrete;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+use \Mergy\Action\AbstractAction;
+
+/**
+ * Action to revert a working-copy
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Revert extends AbstractAction {
+
+    /**
+     * Failure description
+     *
+     * @var string
+     */
+    const PROBLEM = 'Reverting not possible';
+
+    /**
+     * (non-PHPdoc)
+     * @see AbstractAction::_execute()
+     */
+    protected function _execute() {
+        $this->_oCommand->execute('svn revert --non-interactive -R -q ' . $this->_oConfig->path);
+        if ($this->_oCommand->isSuccess() !== true) {
+            $this->_bSuccess = false;
+        }
+
+        if ($this->_bSuccess === true) {
+            $this->_oCommand->execute('svn status --no-ignore ' . $this->_oConfig->path . ' | grep -e ^\? -e ^I | awk \'{print $2}\'| xargs -r rm -r');
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_bSuccess = false;
+            }
+        }
+
+        if ($this->_bSuccess === true) {
+            $this->_oCommand->execute('svn up ' . $this->_oConfig->path);
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_bSuccess = false;
+            }
+        }
+
+        if ((defined('VERBOSE') === true and VERBOSE === true) or $this->_bSuccess === false) {
+            \Mergy\TextUI\Output::info($this->_oCommand->get());
+        }
+
+        return true;
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,42 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Action\Concrete;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+use \Mergy\Action\AbstractAction;
+
+/**
+ * Action which executes a simple command
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Command extends AbstractAction {
+
+    /**
+     * Failure description
+     *
+     * @var string
+     */
+    const PROBLEM = 'Command-Execution did not end with success-code';
+
+    /**
+     * (non-PHPdoc)
+     * @see AbstractAction::_execute()
+     */
+    protected function _execute() {
+        if (empty($this->_oProperties->command) !== true) {
+            $this->_oCommand->execute($this->_oProperties->command);
+            if ($this->_oCommand->isSuccess() !== true) {
+                $this->_bSuccess = false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,45 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\TextUI\Printer\Formatter;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+use \Mergy\TextUI\Printer\FormatterInterface;
+
+/**
+ * Text-Formatter
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Text implements FormatterInterface {
+
+    /**
+     * (non-PHPdoc)
+     * @see FormatterInterface::format()
+     */
+    public function format(array $aStack) {
+        $bBackground = true;
+        $sOutput = '';
+        foreach ($aStack as $aText) {
+            $sPrint = (empty($aText['title']) !== true) ? $aText['title'] : $aText['text'];
+            if ($bBackground === true) {
+                $bBackground = false;
+                $sPrint = sprintf("\033[0;30m\033[47m %s\033[0m", $sPrint);
+            }
+            else {
+                $bBackground = true;
+            }
+
+            $sOutput .= $sPrint . PHP_EOL;
+            if (empty($aText['title']) !== true) {
+                $sOutput .= $aText['text'] . PHP_EOL;
+                $bBackground = true;
+            }
+        }
+
+        return $sOutput;
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

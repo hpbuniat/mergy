@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,71 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Action;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+
+/**
+ * Build an action-object
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Builder {
+
+    /**
+     * The Action-Handler
+     *
+     * @var Handler
+     */
+    protected $_oHandler;
+
+    /**
+     * The notifier wrapper
+     *
+     * @var \notifyy\Collection
+     */
+    protected $_oNotifier;
+
+    /**
+     * Mergy-Config
+     *
+     * @var \stdClass
+     */
+    protected $_oConfig;
+
+    /**
+     * Create the Action-Builder
+     *
+     * @param Handler $oHandler
+     * @param \stdClass $oConfig
+     * @param \notifyy\Collection $oNotifier
+     */
+    public function __construct(Handler $oHandler, \stdClass $oConfig, \notifyy\Collection $oNotifier) {
+        $this->_oHandler = $oHandler;
+        $this->_oConfig = $oConfig;
+        $this->_oNotifier = $oNotifier;
+    }
+
+    /**
+     * Build a Action and add it to the handler
+     *
+     * @param  string $sType
+     * @param  \stdClass $oConfig
+     * @param  string $sStep
+     *
+     * @return Builder
+     */
+    public function build($sType, \stdClass $oConfig, $sStep = null) {
+        $sType = ucfirst(strtolower((isset($oConfig->type) === true) ? $oConfig->type : $sType));
+        $sClass = str_replace('Builder', 'Concrete', get_class($this)) . '\\' . $sType;
+        if (class_exists($sClass) === true) {
+            $oAction = new $sClass($this->_oConfig, $oConfig, $this->_oNotifier);
+            $this->_oHandler->add($oAction, strtolower($sStep));
+        }
+
+        return $this;
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

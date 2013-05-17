@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,50 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Test\Mergy\Util;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+
+/**
+ * Test Command-Execution
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class CommandTest extends \PHPUnit_Framework_TestCase {
+
+    /**
+     * Test Command-Setting via construct
+     */
+    public function testCommandConstruct() {
+        $o = new \Mergy\Util\Command('dir');
+        $this->assertInstanceOf('\\Mergy\\Util\\Command', $o->execute());
+        $this->asserttrue($o->isSuccess());
+        $this->assertContains('mergy.php', $o->get());
+        $this->assertEquals(0, $o->status());
+    }
+
+    /**
+     * Test Command-Setting via command-method
+     */
+    public function testCommandCommand() {
+        $o = new \Mergy\Util\Command();
+        $this->assertInstanceOf('\\Mergy\\Util\\Command', $o->command('dir'));
+        $this->assertInstanceOf('\\Mergy\\Util\\Command', $o->execute());
+        $this->asserttrue($o->isSuccess());
+        $this->assertContains('mergy.php', $o->get());
+        $this->assertEquals(0, $o->status());
+    }
+
+    /**
+     * Test Command-Setting via execute-method
+     */
+    public function testCommandFailure() {
+        $o = new \Mergy\Util\Command();
+        $this->assertInstanceOf('\\Mergy\\Util\\Command', $o->execute('notExisting'));
+        $this->assertfalse($o->isSuccess());
+        $this->assertEquals(127, $o->status());
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

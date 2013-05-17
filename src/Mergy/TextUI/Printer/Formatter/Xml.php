@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,42 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\TextUI\Printer\Formatter;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+use \Mergy\TextUI\Printer\FormatterInterface;
+
+/**
+ * Xml-Formatter
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Xml implements FormatterInterface {
+
+    /**
+     * (non-PHPdoc)
+     * @see FormatterInterface::format()
+     */
+    public function format(array $aStack) {
+        $oWriter = new \XMLWriter();
+        $oWriter->openMemory();
+        $oWriter->startDocument('1.0', 'UTF-8');
+        $oWriter->startElement('tickets');
+        foreach ($aStack as $aText) {
+            $oWriter->startElement('ticket');
+            $oWriter->writeAttribute('rev', $aText['rev']);
+            $oWriter->writeAttribute('title', $aText['title']);
+            $oWriter->writeAttribute('author', $aText['author']);
+            $oWriter->text(preg_replace('/\s/', ' ', $aText['comment']));
+            $oWriter->endElement();
+        }
+
+        $oWriter->endElement();
+        $oWriter->endDocument();
+
+        return $oWriter->outputMemory();
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

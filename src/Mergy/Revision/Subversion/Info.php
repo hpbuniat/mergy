@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,49 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Revision\Subversion;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+use \Mergy\Revision\AggregatorAbstract;
+
+/**
+ * Read the information of a revision
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+class Info extends AggregatorAbstract {
+
+    /**
+     * (non-PHPdoc)
+     * @see \Mergy\Util\Cacheable::_get()
+     */
+    protected function _get() {
+        $sCommand = sprintf('svn log %s --xml -v -r %d', $this->_sRepository, $this->_iRevision);
+        $this->_oCommand->command($sCommand)->execute();
+
+        $this->_mCache = $this->_oCommand->get();
+        if ($this->_oCommand->isSuccess() !== true) {
+            $this->_mCache = '';
+            \Mergy\TextUI\Output::error(sprintf(self::ERROR, $sCommand));
+        }
+
+        return $this;
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \Mergy\Util\Cacheable::get()
+     */
+    public function get() {
+        parent::get();
+        $oInfo = simplexml_load_string($this->_mCache);
+        if ($oInfo instanceof \SimpleXMLElement) {
+            return $oInfo->logentry;
+        }
+
+        throw new \Mergy\Revision\Aggregator\Exception(\Mergy\Revision\Aggregator\Exception::ERROR);
+    }
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);

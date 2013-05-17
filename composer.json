@@ -1,0 +1,39 @@
+{
+    "name": "hpbuniat/mergy",
+    "description": "mergy",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "testy"
+    ],
+    "authors": [
+        {
+            "name": "Hans-Peter Buniat",
+            "email": "hpbuniat@googlemail.com",
+            "role": "lead"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/hpbuniat/notifyy"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/hpbuniat/parallely"
+        }
+    ],
+    "homepage": "https://github.com/hpbuniat/mergy",
+    "require": {
+        "hpbuniat/notifyy": "dev-master",
+        "hpbuniat/parallely": "dev-master",
+        "c9s/GetOptionKit": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Mergy" : ["src/", "tests/"]
+        }
+    },
+    "bin": [
+        "mergy.php"
+    ]
+}

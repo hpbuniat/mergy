@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * mergy
@@ -40,13 +39,42 @@
  * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+namespace Mergy\Action\Merge;
 
-(defined('MERGY_PATH') === true) or define('MERGY_PATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
-if (strpos('@php_bin@', '@php_bin') === 0) {
-    set_include_path(MERGY_PATH . PATH_SEPARATOR . get_include_path());
+
+/**
+ * Abstract for merge-decision
+ *
+ * @author Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @copyright 2011-2012 Hans-Peter Buniat <hpbuniat@googlemail.com>
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @version Release: @package_version@
+ * @link https://github.com/hpbuniat/mergy
+ */
+abstract class AbstractDecision {
+
+    /**
+     * The Config
+     *
+     * @var \stdClass
+     */
+    protected $_oConfig;
+
+    /**
+     * Init a Decision-Object
+     *
+     * @param  \stdClass $oConfig
+     */
+    public function __construct(\stdClass $oConfig) {
+        $this->_oConfig = $oConfig;
+    }
+
+    /**
+     * Decide weather to merge a revision or not
+     *
+     * @param  \Mergy\Revision $oRevision
+     *
+     * @return boolean
+     */
+    abstract public function decide(\Mergy\Revision $oRevision);
 }
-
-require MERGY_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
-$iExit = \Mergy\TextUI\Command::main();
-exit($iExit);
