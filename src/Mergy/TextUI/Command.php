@@ -218,7 +218,7 @@ EOT;
 
             $this->_aArguments['config']->mergeRevisions = $aRevisions;
             if ($this->_aArguments['list'] === true) {
-                $sPrinter = ($this->_aArguments['group'] === true) ? 'Group' : 'List';
+                $sPrinter = ($this->_aArguments['group'] === true) ? \Mergy\TextUI\Printer\Builder::WRITER_GROUP : \Mergy\TextUI\Printer\Builder::WRITER_LIST;
                 $oPrinter = \Mergy\TextUI\Printer\Builder::build($sPrinter, $this->_aArguments['formatter']);
                 \Mergy\TextUI\Output::info($oPrinter->setRevisions($aRevisions)->get());
             }
@@ -313,6 +313,14 @@ EOT;
             $this->_aArguments['config']->force = false;
         }
 
+        if (empty($this->_aArguments['config']->notifiers) === true) {
+            $this->_aArguments['config']->notifiers = null;
+        }
+
+        if (empty($this->_aArguments['config']->parallel) === true) {
+            $this->_aArguments['config']->parallel = null;
+        }
+
         if (empty($this->_aArguments['config']->merge) === true) {
             $this->_aArguments['config']->merge = array(
                 'ticket',
@@ -330,7 +338,7 @@ EOT;
         }
 
         if (defined('VERBOSE') === true and VERBOSE === true) {
-            \Mergy\TextUI\Output::info(print_r($this->_aArguments['config'], true));
+            \Mergy\TextUI\Output::info(print_r($this->_aArguments, true));
 
         }
 

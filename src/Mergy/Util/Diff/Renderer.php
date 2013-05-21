@@ -107,7 +107,7 @@ class Renderer {
      */
     public function __construct() {
         $this->_oHtml = new \DOMDocument('1.0');
-        $this->_oHtml->loadHTMLFile(MERGY_PATH . 'Mergy' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'diff.html');
+        $this->_oHtml->loadHTMLFile(MERGY_PATH . 'src' . DIRECTORY_SEPARATOR . 'Mergy' . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'diff.html');
         $this->_oDiffDiv = $this->_oHtml->getElementById('diffs');
     }
 
@@ -116,7 +116,7 @@ class Renderer {
      *
      * @param  array $aRevisions
      *
-     * @return \Mergy\Util\Diff\Creator
+     * @return $this
      */
     public function revisions(array $aRevisions) {
         $this->_aRevisions = $aRevisions;
@@ -128,7 +128,7 @@ class Renderer {
      *
      * @param  \notifyy\Collection $oNotifier
      *
-     * @return \Mergy\Util\Diff\Creator
+     * @return $this
      */
     public function render(\notifyy\Collection $oNotifier) {
         foreach ($this->_aRevisions as $oRevision) {

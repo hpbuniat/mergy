@@ -123,7 +123,7 @@ class Parameter {
                 return false;
             }
 
-            if (empty($oResult) !== true) {
+            if (empty($oResult->keys) !== true) {
                 foreach ($oResult as  $sOption => $mValue) {
                     switch ($sOption) {
                         case 'rev':
@@ -224,7 +224,9 @@ class Parameter {
                 }
             }
             else {
+                self::$_aArguments['all'] = true;
                 self::$_aArguments['list'] = true;
+                self::$_aArguments['group'] = true;
                 self::$_aArguments['continue'] = true;
             }
         }

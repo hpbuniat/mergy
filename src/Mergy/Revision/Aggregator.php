@@ -82,7 +82,7 @@ class Aggregator {
     protected $_aRevisions = array();
 
     /**
-     * The revision-builder to create a revision with all detail-aggregators
+     * The revision-builder instance, which creates revision - including the vcs-aggregator
      *
      * @var Builder
      */
