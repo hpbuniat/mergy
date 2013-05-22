@@ -79,7 +79,7 @@ class Revert extends AbstractAction {
         }
 
         if ($this->_bSuccess === true) {
-            $this->_oCommand->execute('svn up ' . $this->_oConfig->path);
+            $this->_oCommand->execute('svn up --non-interactive --ignore-externals --accept tf ' . $this->_oConfig->path);
             if ($this->_oCommand->isSuccess() !== true) {
                 $this->_bSuccess = false;
             }

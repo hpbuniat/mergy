@@ -63,11 +63,11 @@ class Single extends AbstractPrinter {
         foreach ($this->_aRevisions as $oRevision) {
             if ($oRevision instanceof \Mergy\Revision) {
                 $aStack[] = array(
-                    'title' => '',
-                    'rev' => $oRevision->iRevision,
-                    'author' => $oRevision->sAuthor,
-                    'comment' => $oRevision->sInfo,
-                    'text' => $oRevision->__toString()
+                    'title' => $oRevision->__toString(),
+                    'ticket' => (int) \Mergy\Action\Merge\Decision\Ticket::parseTicket($oRevision->sInfo),
+                    'rev' => array($oRevision->iRevision),
+                    'author' => array($oRevision->sAuthor),
+                    'comment' => $oRevision->sInfo
                 );
             }
         }

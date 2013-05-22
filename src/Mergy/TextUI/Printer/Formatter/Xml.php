@@ -65,10 +65,10 @@ class Xml implements FormatterInterface {
         $oWriter->startElement('tickets');
         foreach ($aStack as $aText) {
             $oWriter->startElement('ticket');
-            $oWriter->writeAttribute('rev', $aText['rev']);
-            $oWriter->writeAttribute('title', $aText['title']);
-            $oWriter->writeAttribute('author', $aText['author']);
-            $oWriter->text(preg_replace('/\s/', ' ', $aText['comment']));
+            $oWriter->writeAttribute('rev', implode(',', $aText['rev']));
+            $oWriter->writeAttribute('id', $aText['ticket']);
+            $oWriter->writeAttribute('author', implode(',', $aText['author']));
+            $oWriter->text(preg_replace('/\s/', ' ', $aText['title']));
             $oWriter->endElement();
         }
 

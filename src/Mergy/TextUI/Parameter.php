@@ -97,13 +97,13 @@ class Parameter {
             $oOpts->add('v|verbose', 'Toggle verbose mode');
             $oOpts->add('h|help', 'Show help');
             $oOpts->add('version', 'Show the version');
-            $oOpts->add('r|rev', 'Specific revision(s) to merge');
-            $oOpts->add('t|ticket', 'Specific ticket(s) to merge');
+            $oOpts->add('r|rev?', 'Specific revision(s) to merge');
+            $oOpts->add('t|ticket?', 'Specific ticket(s) to merge');
             $oOpts->add('force', 'Force merging');
             $oOpts->add('strict', 'No guessing, eg. !merge');
             $oOpts->add('remote', 'Define the remote source');
-            $oOpts->add('f|formatter', 'The unmerged-rev listing formatter');
-            $oOpts->add('p|path', 'The merge-path (wc)');
+            $oOpts->add('f|formatter?', 'The unmerged-rev listing formatter');
+            $oOpts->add('p|path?', 'The merge-path (wc)');
             $oOpts->add('continue', 'Continue - do not revert wc');
             $oOpts->add('more', 'There is more coming, to not commit');
             $oOpts->add('commit', 'Commit after success');

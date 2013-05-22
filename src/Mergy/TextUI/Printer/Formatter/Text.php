@@ -62,7 +62,7 @@ class Text implements FormatterInterface {
         $bBackground = true;
         $sOutput = '';
         foreach ($aStack as $aText) {
-            $sPrint = (empty($aText['title']) !== true) ? $aText['title'] : $aText['text'];
+            $sPrint = (empty($aText['title']) !== true) ? $aText['title'] : $aText['ticket'];
             if ($bBackground === true) {
                 $bBackground = false;
                 $sPrint = sprintf("\033[0;30m\033[47m %s\033[0m", $sPrint);
@@ -72,8 +72,8 @@ class Text implements FormatterInterface {
             }
 
             $sOutput .= $sPrint . PHP_EOL;
-            if (empty($aText['title']) !== true) {
-                $sOutput .= $aText['text'] . PHP_EOL;
+            if (empty($aText['comment']) !== true) {
+                $sOutput .= sprintf("\t%s: %s @ %s", $aText['ticket'], implode(', ', $aText['author']), implode(', ', $aText['rev'])) . PHP_EOL;
                 $bBackground = true;
             }
         }

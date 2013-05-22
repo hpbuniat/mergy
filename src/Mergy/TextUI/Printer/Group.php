@@ -85,10 +85,10 @@ class Group extends AbstractPrinter {
             sort($aRevisionNumbers);
 
             $aStack[] = array(
-                'title' => sprintf("Ticket: %s (%s)", $sTicket, implode(',', $aAuthors)),
-                'text' => "\t" . implode(',', $aRevisionNumbers),
-                'rev' => '',
-                'author' => '',
+                'title' => sprintf("Ticket: %s", $sTicket),
+                'ticket' => $sTicket,
+                'rev' => $aRevisionNumbers,
+                'author' => $aAuthors,
                 'comment' => ''
             );
         }
