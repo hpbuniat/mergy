@@ -65,14 +65,14 @@ class Text implements FormatterInterface {
             $sPrint = (empty($aText['title']) !== true) ? $aText['title'] : $aText['ticket'];
             if ($bBackground === true) {
                 $bBackground = false;
-                $sPrint = sprintf("\033[0;30m\033[47m %s\033[0m", $sPrint);
+                $sPrint = sprintf("\033[0;30m\033[47m%s\033[0m", $sPrint);
             }
             else {
                 $bBackground = true;
             }
 
             $sOutput .= $sPrint . PHP_EOL;
-            if (empty($aText['comment']) !== true) {
+            if (empty($aText['comment']) === true) {
                 $sOutput .= sprintf("\t%s: %s @ %s", $aText['ticket'], implode(', ', $aText['author']), implode(', ', $aText['rev'])) . PHP_EOL;
                 $bBackground = true;
             }
