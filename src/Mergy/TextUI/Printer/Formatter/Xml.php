@@ -68,7 +68,7 @@ class Xml implements FormatterInterface {
             $oWriter->writeAttribute('rev', implode(',', $aText['rev']));
             $oWriter->writeAttribute('id', $aText['ticket']);
             $oWriter->writeAttribute('author', implode(',', $aText['author']));
-            $oWriter->writeAttribute('comment', preg_replace('/\s/', ' ', htmlspecialchars($aText['comment'], ENT_QUOTES | ENT_DISALLOWED)));
+            $oWriter->writeAttribute('comment', preg_replace('/\s/', ' ', htmlspecialchars($aText['comment'], ENT_QUOTES)));
             $oWriter->text(preg_replace('/\s/', ' ', $aText['title']));
             $oWriter->endElement();
         }
