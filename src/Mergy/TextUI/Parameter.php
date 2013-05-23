@@ -101,7 +101,7 @@ class Parameter {
             $oOpts->add('t|ticket?', 'Specific ticket(s) to merge');
             $oOpts->add('force', 'Force merging');
             $oOpts->add('strict', 'No guessing, eg. !merge');
-            $oOpts->add('remote', 'Define the remote source');
+            $oOpts->add('remote?', 'Define the remote source');
             $oOpts->add('f|formatter?', 'The unmerged-rev listing formatter');
             $oOpts->add('p|path?', 'The merge-path (wc)');
             $oOpts->add('continue', 'Continue - do not revert wc');
